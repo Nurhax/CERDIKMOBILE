@@ -9,6 +9,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_spinkit: "5.1.0"
+  curved_navigation_bar: ^1.0.6 #latest version
+  table_calendar: ^3.1.2
 
 dev_dependencies:
   flutter_test:
@@ -17,3 +20,11 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+  - img/mascot.png
+  - img/roledokter.png
+  - img/rolepasien.png
+  - img/loadingtop.png
+  - img/loadingbody1.png
+  - img/loadingbody2.png
