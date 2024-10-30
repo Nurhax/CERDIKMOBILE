@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'obat.dart';
+import 'jadwal.dart';
 
 class Pasien {
   String? username;
@@ -11,7 +11,7 @@ class Pasien {
   String? nama;
   String? gender;
   List<Map<String, dynamic>>? gejala;
-  List<Map<Obat, dynamic>>? obatPasien;
+  List<Map<Jadwal, dynamic>>? jadwalPasien;
 
   void CreateIDPasien() {
     id = Random(100000).toString();
