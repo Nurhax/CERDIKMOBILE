@@ -62,6 +62,6 @@ class JadwalObat {
       'IsConfirmedNakes': isConfirmedNakes,
       'Frekuensi': frekuensi,
     };
-  }
+}
    
 }
