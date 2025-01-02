@@ -3,10 +3,11 @@ import 'package:intl/intl.dart';
 import 'package:tubes/models/manage_jadwal.dart';
 
 class UpdateInputScreen extends StatefulWidget {
+   final String idJadwal;
   final Function onRefresh;
   final Map<String, dynamic> jadwal;
 
-  UpdateInputScreen({required this.onRefresh, required this.jadwal});
+   const UpdateInputScreen({required this.onRefresh, Key? key, required this.idJadwal, required this.jadwal}) : super(key: key);
 
   @override
   _UpdateInputScreenState createState() => _UpdateInputScreenState();
@@ -58,52 +59,54 @@ class _UpdateInputScreenState extends State<UpdateInputScreen> {
   }
 
   Future<void> submitForm() async {
-    if (idPasien.text.isNotEmpty &&
-        namaObat.text.isNotEmpty &&
-        gejala.text.isNotEmpty &&
-        dosis.text.isNotEmpty &&
-        startDate.text.isNotEmpty &&
-        endDate.text.isNotEmpty &&
-        selectedJenisObat != null &&
-        selectedFrekuensi != null &&
-        selectedWaktuKonsumsi != null) {
-      try {
-        Map<String, String> data = {
-          "IDPasien": idPasien.text,
-          "NamaObat": namaObat.text,
-          "Gejala": gejala.text,
-          "Dosis": dosis.text,
-          "Deskripsi": deskripsi.text,
-          "JenisObat": selectedJenisObat!,
-          "Start_Date": startDate.text,
-          "End_Date": endDate.text,
-          "Frekuensi": selectedFrekuensi!,
-          "WaktuKonsumsi": selectedWaktuKonsumsi!.format(context),
-          "Jumlah": jumlah.text,
-        };
-        final response = await JadwalService.updateJadwal(data);
-        if (response["status"] == "success") {
-          Navigator.pop(context);
-          widget.onRefresh();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Jadwal successfully updated")),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Failed to update Jadwal")),
-          );
-        }
-      } catch (e) {
+  if (namaObat.text.isNotEmpty &&
+      gejala.text.isNotEmpty &&
+      dosis.text.isNotEmpty &&
+      startDate.text.isNotEmpty &&
+      endDate.text.isNotEmpty &&
+      selectedJenisObat != null &&
+      selectedFrekuensi != null &&
+      selectedWaktuKonsumsi != null) {
+    
+    try {
+      Map<String, String> data = {
+        "IDJadwal": widget.idJadwal,  // Pass the IDJadwal from the widget or context
+        "NamaObat": namaObat.text,
+        "Gejala": gejala.text,
+        "Dosis": dosis.text,
+        "Deskripsi": deskripsi.text,
+        "JenisObat": selectedJenisObat!,
+        "Start_Date": startDate.text,
+        "End_Date": endDate.text,
+        "Frekuensi": selectedFrekuensi!,
+        "WaktuKonsumsi": selectedWaktuKonsumsi!.format(context),
+        "Jumlah": jumlah.text,
+      };
+
+      final response = await JadwalService.updateJadwal(data);
+      if (response["status"] == "success") {
+        Navigator.pop(context);
+        widget.onRefresh();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: $e")),
+          SnackBar(content: Text("Jadwal successfully updated")),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Failed to update Jadwal")),
         );
       }
-    } else {
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please fill in all required fields")),
+        SnackBar(content: Text("Error: $e")),
       );
     }
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Please fill in all required fields")),
+    );
   }
+}
+
 
   Future<void> _selectDate(
       BuildContext context, TextEditingController controller) async {

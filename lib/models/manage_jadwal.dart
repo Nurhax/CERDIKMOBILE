@@ -53,32 +53,42 @@ class JadwalService {
     }
   }
 
-  static Future<Map<String, dynamic>> updateJadwal(
-      Map<String, String> data) async {
-    String url = "http://10.0.2.2/APIPPB/update_jadwal.php";
-    try {
-      final res = await http.post(Uri.parse(url), body: data);
-      if (res.statusCode == 200) {
-        return jsonDecode(res.body);
-      } else {
-        throw Exception("Failed to update Jadwal: ${res.statusCode}");
-      }
-    } catch (e) {
-      throw Exception("Error updating Jadwal: $e");
+ static Future<Map<String, dynamic>> updateJadwal(Map<String, String> data) async {
+  String url = "http://10.0.2.2/APIPPB/update_jadwal.php"; // Adjust IP as necessary
+  try {
+    final res = await http.post(
+      Uri.parse(url),
+      body: data,
+    );
+    if (res.statusCode == 200) {
+      return jsonDecode(res.body);
+    } else {
+      throw Exception("Failed to update Jadwal: ${res.statusCode}");
     }
+  } catch (e) {
+    throw Exception("Error updating Jadwal: $e");
   }
-
+}
   static Future<Map<String, dynamic>> deleteJadwal(String id) async {
-    String url = "http://10.0.2.2/Jadwal_Api/delete_jadwal.php";
-    try {
-      final res = await http.post(Uri.parse(url), body: {"IDPasien": id});
-      if (res.statusCode == 200) {
-        return jsonDecode(res.body);
-      } else {
-        throw Exception("Failed to delete Jadwal: ${res.statusCode}");
-      }
-    } catch (e) {
-      throw Exception("Error deleting Jadwal: $e");
+  String url = "http://10.0.2.2/APIPPB/delete_jadwal.php"; // Adjust for real IP if on physical device
+  try {
+    final body = {'IDJadwal': id}; // Send as form data
+    print("Sending Request Body: $body"); // Log the request body
+
+    final response = await http.post(
+      Uri.parse(url),
+      body: body,
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception("Failed to delete Jadwal: ${response.statusCode}");
     }
+  } catch (e) {
+    throw Exception("Error deleting Jadwal: $e");
   }
+}
+
+
 }

@@ -47,24 +47,24 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  Future<void> handleDelete(String id) async {
-    try {
-      final response = await JadwalService.deleteJadwal(id);
-      if (response["status"] == "success") {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Jadwal successfully deleted")),
-        );
-        refreshData();
-      } else {
-        throw Exception("Failed to delete Jadwal");
-      }
-    } catch (e) {
-      print(e);
+ Future<void> handleDelete(String id) async {
+  try {
+    final response = await JadwalService.deleteJadwal(id);
+    if (response["status"] == "success") {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e")),
+        SnackBar(content: Text("Jadwal successfully deleted")),
       );
+      refreshData();
+    } else {
+      throw Exception("Failed to delete Jadwal");
     }
+  } catch (e) {
+    print(e);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Error: $e")),
+    );
   }
+}
 
   void _handleMenuAction(String value, JadwalObat jadwal) {
     if (value == 'Edit') {
@@ -85,13 +85,14 @@ class _HomeScreenState extends State<HomeScreen> {
               'WaktuKonsumsi': jadwal.waktuKonsumsi,
             },
             onRefresh:
-                refreshData, // Call a method to refresh the list after editing
+                refreshData, idJadwal: jadwal.idJadwal, // Call a method to refresh the list after editing
           ),
+          
         ),
       );
     } else if (value == 'Delete') {
-      print('Deleting ID: ${jadwal.idPasien}'); // Add debug log
-      handleDelete(jadwal.idPasien.toString()); // Ensure the correct ID is used
+      print('Deleting ID: ${jadwal.idJadwal}'); // Add debug log
+      handleDelete(jadwal.idJadwal.toString()); // Ensure the correct ID is used
     }
   }
 
