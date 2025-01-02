@@ -1330,6 +1330,7 @@ class detailObat extends StatelessWidget {
                           initialDeskripsi: obat.deskripsi ?? "No description available.",
                           initialGejalaObat: obat.gejalaObat ?? "Unknown Gejala",
                           initialUkuran: obat.ukuran ?? "Unknown Size",
+                          obatId: obat.idObat ?? "0",
                         ),
                       ),
                     );

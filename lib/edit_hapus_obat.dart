@@ -762,6 +762,7 @@ class EditFormDataObat extends StatelessWidget {
   final String initialDeskripsi;
   final String initialGejalaObat; // Corrected to 'gejalaObat'
   final String initialUkuran;
+  final String obatId;
 
   const EditFormDataObat({
     super.key,
@@ -772,6 +773,7 @@ class EditFormDataObat extends StatelessWidget {
     required this.initialDeskripsi,
     required this.initialGejalaObat, // Corrected to 'gejalaObat'
     required this.initialUkuran,
+    required this.obatId,
   });
 
   @override
@@ -944,43 +946,47 @@ class EditFormDataObat extends StatelessWidget {
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    print("Submitting Data:");
-                    print("Nama Obat: " + obatNameController.text);
-                    print("Dosis: " + dosisController.text);
-                    print("Jenis Obat:" + jenisObatController.text);
-                    print("Satuan: " + ukuranController.text);
-                    print("Gejala: " + gejalaObatController.text);
-                    print("Deskripsi: " + deskripsiController.text);
-                    Obat.updateObatData(
-                      obatNameController.text,
-                      jenisObatController.text,
-                      dosisController.text,
-                      deskripsiController.text,
-                      gejalaObatController.text, // Corrected to 'gejalaObat'
-                      ukuranController.text,
-                    );
+                child:ElevatedButton(
+  onPressed: () {
+    print("Submitting Data:");
+    print("Nama Obat: " + obatNameController.text);
+    print("Dosis: " + dosisController.text);
+    print("Jenis Obat:" + jenisObatController.text);
+    print("Satuan: " + ukuranController.text);
+    print("Gejala: " + gejalaObatController.text);
+    print("Deskripsi: " + deskripsiController.text);
 
-                    print("Data updated successfully!");
-                    // Close the page on success
-                    Navigator.pop(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0Xffbfdbfe),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25.0),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  child: const Text(
-                    "Edit Obat",
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xff2563eb)),
-                  ),
-                ),
+    // Pass the 'id' along with other details
+    Obat.updateObatData(
+      obatId,  // Pass the obat ID
+      obatNameController.text,
+      jenisObatController.text,
+      dosisController.text,
+      deskripsiController.text,
+      gejalaObatController.text,
+      ukuranController.text,
+    );
+
+    print("Data updated successfully!");
+    // Close the page on success
+    Navigator.pop(context);
+  },
+  style: ElevatedButton.styleFrom(
+    backgroundColor: const Color(0Xffbfdbfe),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(25.0),
+    ),
+    padding: const EdgeInsets.symmetric(vertical: 16),
+  ),
+  child: const Text(
+    "Edit Obat",
+    style: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.bold,
+        color: Color(0xff2563eb)),
+  ),
+),
+
               ),
             ],
           ),

@@ -112,6 +112,7 @@ static Future<bool> insertObatData(
 } 
 
 static Future<bool> updateObatData(
+    String obatId,  // Add 'id' as a parameter
     String obatName,
     String jenisObat,
     String dosis,
@@ -123,11 +124,12 @@ static Future<bool> updateObatData(
       final response = await http.post(
         Uri.parse("http://10.0.2.2/APIPPB/update_obat.php"),
         body: {
+          "id": obatId,  // Pass the 'id' of the obat
           "nama": obatName,
           "jenis": jenisObat,
           "saranPenyajian": dosis,
           "deskripsi": deskripsi,
-          "gejala_obat": gejalaObat,  // Correct field name
+          "gejala_obat": gejalaObat,
           "ukuran": ukuran,
         },
       );
@@ -149,6 +151,7 @@ static Future<bool> updateObatData(
       return false;
     }
   }
+
 static Future<bool> deleteObatData(String? idObat) async {
     try {
       // Log the ID being sent for deletion
