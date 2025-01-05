@@ -4,6 +4,7 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:tubes/PanduanDokterPage.dart';
 import 'package:tubes/edit_hapus_obat.dart';
 import 'package:tubes/models/jadwal.dart';
 import 'package:tubes/models/manage_jadwal.dart';
@@ -820,7 +821,7 @@ class morePage extends StatelessWidget {
                 ),
                 onPressed: () {
                   // Aksi untuk tombol Pemandu
-                  print("Pemandu button clicked");
+                  PanduanDokter.showGuideDialog(context);
                 },
                 child: const Row(
                   children: [

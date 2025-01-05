@@ -5,6 +5,7 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 // import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:tubes/PanduanPasienPage.dart';
 import 'package:tubes/edit_notif.dart';
 import 'package:tubes/models/jadwal.dart';
 import 'package:tubes/models/manage_jadwal.dart';
@@ -786,7 +787,7 @@ class profilePasien extends StatelessWidget {
                 ),
                 onPressed: () {
                   // Aksi untuk tombol Pemandu
-                  print("Pemandu button clicked");
+                  PanduanPasien.showGuideDialog(context);
                 },
                 child: const Row(
                   children: [
