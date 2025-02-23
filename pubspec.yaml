@@ -1,3 +1,4 @@
+
 name: tubes
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
@@ -40,6 +41,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   http: ^1.2.2
 
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -61,6 +63,7 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
 
   # To add assets to your application, add an assets section, like this:
   # assets:
@@ -114,3 +117,4 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
