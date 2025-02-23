@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "cerdik_ppb" "\0"
+            VALUE "FileDescription", "tubes" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "cerdik_ppb" "\0"
+            VALUE "InternalName", "tubes" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2024 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "cerdik_ppb.exe" "\0"
-            VALUE "ProductName", "cerdik_ppb" "\0"
+            VALUE "OriginalFilename", "tubes.exe" "\0"
+            VALUE "ProductName", "tubes" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

@@ -1,6 +1,6 @@
 {
-    "name": "cerdik_ppb",
-    "short_name": "cerdik_ppb",
+    "name": "tubes",
+    "short_name": "tubes",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
