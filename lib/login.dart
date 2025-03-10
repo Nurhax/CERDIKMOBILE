@@ -7,6 +7,7 @@ import 'package:tubes/models/pasien.dart';
 import 'package:tubes/pilihRole.dart';
 import 'package:tubes/loadingPagePasien.dart';
 import 'package:http/http.dart' as http;
+import 'Security/hashing_service.dart';
 
 void main() {
   runApp(const Login());
@@ -22,6 +23,26 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+
+  void showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Login Error"),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -155,6 +176,8 @@ class _LoginState extends State<Login> {
                                   var User = listPasien.firstWhere(
                                     (user) =>
                                         user['username'] == username &&
+                                        // HashingService.verifyPassword(
+                                        //     password, user['password']),
                                         user['password'] == password,
                                     orElse: () =>
                                         null, // Return null if no match is found
@@ -195,6 +218,8 @@ class _LoginState extends State<Login> {
                                     (user) =>
                                         user['username'] == username &&
                                         user['password'] == password,
+                                    // HashingService.verifyPassword(password, user['password']),
+
                                     orElse: () =>
                                         null, // Return null if no match is found
                                   );
@@ -214,6 +239,9 @@ class _LoginState extends State<Login> {
                                                 loadingpageNakes(
                                                   nakesSaatIni: nakesSaatini,
                                                 )));
+                                  } else {
+                                    showErrorDialog(context,
+                                        "Username Atau Password Salah!");
                                   }
                                 }
                               } catch (e) {

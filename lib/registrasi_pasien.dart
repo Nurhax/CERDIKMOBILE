@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:tubes/login.dart';
 import 'package:tubes/pilihRole.dart';
 import 'package:http/http.dart' as http;
+import 'Security/hashing_service.dart';
 
 void main() {
   runApp(RegistrasiPasien());
@@ -20,6 +21,26 @@ class RegistrasiPasien extends StatelessWidget {
   final TextEditingController jenisKelaminTextController =
       TextEditingController();
 
+  void showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Register Error"),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> daftarPasienInsert(BuildContext context) async {
     if (userNameTextController.text.isNotEmpty &&
         namaLengkapTextController.text.isNotEmpty &&
@@ -31,7 +52,8 @@ class RegistrasiPasien extends StatelessWidget {
         String uri = "http://10.0.2.2/APIPPB/insert_record_pasien.php";
         var res = await http.post(Uri.parse(uri), body: {
           "username": userNameTextController.text.trim(),
-          "password": passwordTextController.text.trim(),
+          "password":
+              HashingService.hashPassword(passwordTextController.text.trim()),
           "email": emailTextController.text.trim(),
           "usia": tanggalLahirController.text.trim(),
           "nama": namaLengkapTextController.text.trim(),
@@ -60,6 +82,7 @@ class RegistrasiPasien extends StatelessWidget {
       }
     } else {
       print("TOLONG LENGKAPI DATA TERLEBIH DAHULU!");
+      showErrorDialog(context, "DATA BELUM LENGKAP!");
     }
   }
 

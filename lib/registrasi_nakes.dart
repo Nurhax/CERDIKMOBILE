@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:tubes/login.dart';
 import 'package:tubes/pilihRole.dart';
 import 'package:http/http.dart' as http;
+import 'Security/hashing_service.dart';
 
 void main() {
   runApp(RegistrasiNakes());
@@ -19,6 +20,26 @@ class RegistrasiNakes extends StatelessWidget {
   final TextEditingController passwordTextController = TextEditingController();
   final TextEditingController nomorSTRTextController = TextEditingController();
 
+  void showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Register Error"),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> daftarNakesInsert(BuildContext context) async {
     if (usernameTextController.text.isNotEmpty &&
         namaLengkapTextController.text.isNotEmpty &&
@@ -32,7 +53,8 @@ class RegistrasiNakes extends StatelessWidget {
           "username": usernameTextController.text.trim(),
           "nama": namaLengkapTextController.text.trim(),
           "email": emailTextController.text.trim(),
-          "password": passwordTextController.text.trim(),
+          "password":
+              HashingService.hashPassword(passwordTextController.text.trim()),
           "nomorSTR": nomorSTRTextController.text.trim()
         });
         //Nomor STR harus 7 angka
@@ -58,6 +80,7 @@ class RegistrasiNakes extends StatelessWidget {
       }
     } else {
       print("TOLONG LENGKAPI DATA TERLEBIH DAHULU!");
+      showErrorDialog(context, "DATA BELUM LENGKAP!");
     }
   }
 
