@@ -45,41 +45,46 @@ class RegistrasiNakes extends StatelessWidget {
         namaLengkapTextController.text.isNotEmpty &&
         emailTextController.text.isNotEmpty &&
         passwordTextController.text.isNotEmpty &&
-        nomorSTRTextController.text.isNotEmpty &&
-        nomorSTRTextController.text.length == 7) {
+        nomorSTRTextController.text.isNotEmpty) {
       try {
-        String uri = "http://10.0.2.2/APIPPB/insert_record_nakes.php";
-        var res = await http.post(Uri.parse(uri), body: {
-          "username": usernameTextController.text.trim(),
-          "nama": namaLengkapTextController.text.trim(),
-          "email": emailTextController.text.trim(),
-          "password":
-              HashingService.hashPassword(passwordTextController.text.trim()),
-          "nomorSTR": nomorSTRTextController.text.trim()
-        });
-        //Nomor STR harus 7 angka
-        if (res.statusCode == 200) {
-          var response = jsonDecode(res.body);
-          if (response["success"] == "true") {
-            debugPrint("Record Insert Successfull");
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Registrasi Nakes Berhasil!')),
-            );
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const Login()),
-            );
-          } else {
-            debugPrint("Error ${response}");
-          }
+        if (nomorSTRTextController.text.length != 7) {
+          showErrorDialog(context, "Nomor STR Tidak Valid Harus 7 Digit!");
+        } else if (emailTextController.text.contains("@")) {
+          showErrorDialog(context, "Email Tidak Valid, Input Kembali Email!");
         } else {
-          debugPrint("Error: ${res.statusCode}, ${res.body}");
+          String uri = "http://10.0.2.2/APIPPB/insert_record_nakes.php";
+          var res = await http.post(Uri.parse(uri), body: {
+            "username": usernameTextController.text.trim(),
+            "nama": namaLengkapTextController.text.trim(),
+            "email": emailTextController.text.trim(),
+            "password":
+                HashingService.hashPassword(passwordTextController.text.trim()),
+            "nomorSTR": nomorSTRTextController.text.trim()
+          });
+          //Nomor STR harus 7 angka
+          if (res.statusCode == 200) {
+            var response = jsonDecode(res.body);
+            if (response["success"] == "true") {
+              debugPrint("Record Insert Successfull");
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Registrasi Nakes Berhasil!')),
+              );
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Login()),
+              );
+            } else {
+              debugPrint("Error ${response}");
+            }
+          } else {
+            debugPrint("Error: ${res.statusCode}, ${res.body}");
+          }
         }
       } catch (e) {
         print("ERROR! $e");
       }
     } else {
-      print("TOLONG LENGKAPI DATA TERLEBIH DAHULU!");
+      print("Tolong Lengkapi Data Terlebih Dahulu!");
       showErrorDialog(context, "DATA BELUM LENGKAP!");
     }
   }

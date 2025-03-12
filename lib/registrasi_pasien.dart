@@ -49,40 +49,51 @@ class RegistrasiPasien extends StatelessWidget {
         tanggalLahirController.text.isNotEmpty &&
         jenisKelaminTextController.text.isNotEmpty) {
       try {
-        String uri = "http://10.0.2.2/APIPPB/insert_record_pasien.php";
-        var res = await http.post(Uri.parse(uri), body: {
-          "username": userNameTextController.text.trim(),
-          "password":
-              HashingService.hashPassword(passwordTextController.text.trim()),
-          "email": emailTextController.text.trim(),
-          "usia": tanggalLahirController.text.trim(),
-          "nama": namaLengkapTextController.text.trim(),
-          "gender": jenisKelaminTextController.text.trim()
-        });
-
-        if (res.statusCode == 200) {
-          var response = jsonDecode(res.body);
-          if (response["success"] == "true") {
-            debugPrint("Record Insert Successfull");
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Registrasi Berhasil!')),
-            );
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const Login()),
-            );
-          } else {
-            debugPrint("Error ${response}");
-          }
+        if (!emailTextController.text.contains("@")) {
+          showErrorDialog(context, "Format Email Salah, Input Kembali Email");
+        } else if (!tanggalLahirController.text.contains("/")) {
+          showErrorDialog(
+              context, "Format Tanggal Lahir Salah, Gunakan Format DD/MM/YYYY");
+        } else if (jenisKelaminTextController.text.toLowerCase() != "p" ||
+            jenisKelaminTextController.text.toLowerCase() != "L") {
+          showErrorDialog(context, "Format Jenis Kelamin Salah!, Gunakan L/P");
         } else {
-          debugPrint("Error: ${res.statusCode}, ${res.body}");
+          String uri = "http://10.0.2.2/APIPPB/insert_record_pasien.php";
+          var res = await http.post(Uri.parse(uri), body: {
+            "username": userNameTextController.text.trim(),
+            "password":
+                HashingService.hashPassword(passwordTextController.text.trim()),
+            "email": emailTextController.text.trim(),
+            "usia": tanggalLahirController.text.trim(),
+            "nama": namaLengkapTextController.text.trim(),
+            "gender": jenisKelaminTextController.text.trim()
+          });
+
+          if (res.statusCode == 200) {
+            var response = jsonDecode(res.body);
+            if (response["success"] == "true") {
+              debugPrint("Record Insert Successfull");
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Registrasi Berhasil!')),
+              );
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Login()),
+              );
+            } else {
+              debugPrint("Error ${response}");
+            }
+          } else {
+            debugPrint("Error: ${res.statusCode}, ${res.body}");
+          }
         }
       } catch (e) {
         print("ERROR! $e");
       }
     } else {
       print("TOLONG LENGKAPI DATA TERLEBIH DAHULU!");
-      showErrorDialog(context, "DATA BELUM LENGKAP!");
+      showErrorDialog(
+          context, "Data Belum Lengkap, Tolong Lengkapi Terlebih Dahulu");
     }
   }
 

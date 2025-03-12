@@ -208,6 +208,8 @@ class _LoginState extends State<Login> {
                                 print('Error Login: $e');
                               }
 
+                              //Refactor ini biar pakai 1 try aja
+
                               try {
                                 var nakesResponse =
                                     await http.get(Uri.parse(uriNakes));
@@ -239,9 +241,6 @@ class _LoginState extends State<Login> {
                                                 loadingpageNakes(
                                                   nakesSaatIni: nakesSaatini,
                                                 )));
-                                  } else {
-                                    showErrorDialog(context,
-                                        "Username Atau Password Salah!");
                                   }
                                 }
                               } catch (e) {
