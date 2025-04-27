@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:tubes/pagePasien.dart';
 import 'package:tubes/models/pasien.dart';
+import 'package:provider/provider.dart';
+import 'theme_provider.dart'; // Import file yang dibuat
 
 void main() {
-  runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => ThemeProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -11,12 +18,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: SoundNotificationScreen(
-        pasienSaatIni: Pasien(),
-        someCondition: true,
-      ),
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: themeProvider.currentTheme,
+          home: SoundNotificationScreen(
+              pasienSaatIni: Pasien(), someCondition: true),
+        );
+      },
     );
   }
 }
@@ -52,12 +62,18 @@ class _SoundNotificationScreenState extends State<SoundNotificationScreen> {
   final List<String> customSounds = ['Tambah suara notifikasi', 'Dj Angkot'];
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.blue,
-        title: const Text(
+        backgroundColor:
+            isDarkMode ? Color(0xFF2A2A3C) : Color.fromARGB(255, 37, 105, 255),
+        title: Text(
           'Suara Notifikasi',
-          style: TextStyle(color: Colors.black),
+          style: TextStyle(
+            color: isDarkMode ? Colors.white : Colors.black,
+          ),
         ),
         leading: IconButton(
           color: Colors.white,
@@ -93,7 +109,15 @@ class _SoundNotificationScreenState extends State<SoundNotificationScreen> {
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.blue, Colors.blue.shade200],
+            colors: isDarkMode
+                ? [
+                    Color.fromARGB(255, 182, 181, 181), // Warna gelap atas
+                    Color.fromARGB(255, 182, 181, 181), // Warna gelap bawah
+                  ]
+                : [
+                    Color.fromARGB(255, 37, 100, 235),
+                    Colors.blue.shade400 // Warna terang bawah
+                  ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -111,7 +135,8 @@ class _SoundNotificationScreenState extends State<SoundNotificationScreen> {
                     radius: 25,
                     child: Icon(
                       Icons.music_note,
-                      color: Colors.blue.shade700,
+                      color:
+                          isDarkMode ? Color(0xFF2A2A3C) : Colors.blue.shade700,
                     ),
                   );
                 }),
@@ -131,7 +156,9 @@ class _SoundNotificationScreenState extends State<SoundNotificationScreen> {
                   ),
                   ...defaultSounds.map((sound) => Container(
                         decoration: BoxDecoration(
-                          color: Colors.blue.shade400.withOpacity(0.6),
+                          color: isDarkMode
+                              ? Color(0xFF2A2A3C)
+                              : const Color.fromARGB(255, 37, 105, 255),
                           borderRadius: BorderRadius.circular(5),
                         ),
                         margin: const EdgeInsets.symmetric(
@@ -143,7 +170,8 @@ class _SoundNotificationScreenState extends State<SoundNotificationScreen> {
                           ),
                           value: sound,
                           groupValue: selectedSound,
-                          activeColor: Colors.white,
+                          activeColor:
+                              isDarkMode ? Color(0xFF00FFF5) : Colors.white,
                           onChanged: (value) {
                             setState(() {
                               selectedSound = value!;
@@ -170,7 +198,9 @@ class _SoundNotificationScreenState extends State<SoundNotificationScreen> {
                   ),
                   ...customSounds.map((sound) => Container(
                         decoration: BoxDecoration(
-                          color: Colors.blue.shade400.withOpacity(0.6),
+                          color: isDarkMode
+                              ? Color(0xFF2A2A3C)
+                              : const Color.fromARGB(255, 37, 105, 255),
                           borderRadius: BorderRadius.circular(5),
                         ),
                         margin: const EdgeInsets.symmetric(
@@ -182,7 +212,8 @@ class _SoundNotificationScreenState extends State<SoundNotificationScreen> {
                           ),
                           value: sound,
                           groupValue: selectedSound,
-                          activeColor: Colors.white,
+                          activeColor:
+                              isDarkMode ? Color(0xFF00FFF5) : Colors.white,
                           onChanged: (value) {
                             setState(() {
                               selectedSound = value!;

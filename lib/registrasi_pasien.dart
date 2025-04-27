@@ -1,17 +1,26 @@
 import 'dart:convert';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:tubes/login.dart';
 import 'package:tubes/pilihRole.dart';
 import 'package:http/http.dart' as http;
 import 'Security/hashing_service.dart';
+import 'package:provider/provider.dart';
+import 'theme_provider.dart'; // Import file yang dibuat
 
 void main() {
-  runApp(RegistrasiPasien());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => ThemeProvider(),
+      child: RegistrasiPasien(someCondition: true),
+    ),
+  );
 }
 
 class RegistrasiPasien extends StatelessWidget {
-  RegistrasiPasien({super.key});
+  final bool someCondition;
+  RegistrasiPasien({super.key, required this.someCondition});
   final TextEditingController userNameTextController = TextEditingController();
   final TextEditingController namaLengkapTextController =
       TextEditingController();
@@ -78,7 +87,8 @@ class RegistrasiPasien extends StatelessWidget {
               );
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const Login()),
+                MaterialPageRoute(
+                    builder: (context) => const Login(someCondition: true)),
               );
             } else {
               debugPrint("Error ${response}");
@@ -99,9 +109,11 @@ class RegistrasiPasien extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
     return MaterialApp(
       home: Scaffold(
-        backgroundColor: const Color(0xFF2563EB),
+        backgroundColor: isDarkMode ? Color(0xFF2A2A3C) : Color(0xFF2563EB),
         body: Stack(
           children: [
             Positioned(
@@ -110,8 +122,10 @@ class RegistrasiPasien extends StatelessWidget {
               right: 0,
               child: Container(
                 height: 480,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
+                decoration: BoxDecoration(
+                  color: isDarkMode
+                      ? const Color.fromARGB(255, 202, 201, 201)
+                      : Colors.white,
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(30),
                     topRight: Radius.circular(30),
@@ -129,24 +143,32 @@ class RegistrasiPasien extends StatelessWidget {
                             controller: userNameTextController,
                             decoration: InputDecoration(
                               prefixIcon: const Icon(Icons.person),
-                              prefixIconColor: Colors.blue,
+                              filled: true,
+                              fillColor: Colors.white,
+                              prefixIconColor:
+                                  isDarkMode ? Color(0xFF2A2A3C) : Colors.blue,
                               labelText: 'Username',
                               labelStyle: const TextStyle(color: Colors.grey),
                               contentPadding: const EdgeInsets.symmetric(
                                   vertical: 10, horizontal: 10),
-                              enabledBorder: const OutlineInputBorder(
+                              enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.only(
                                     topLeft: Radius.circular(25),
                                     topRight: Radius.circular(25),
                                     bottomLeft: Radius.circular(10),
                                     bottomRight: Radius.circular(10)),
-                                borderSide:
-                                    BorderSide(color: Color(0xFF2563EB)),
+                                borderSide: BorderSide(
+                                    color: isDarkMode
+                                        ? Color(0xFF2A2A3C)
+                                        : Color(0xFF2563EB)),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20),
-                                borderSide: const BorderSide(
-                                    color: Colors.blue, width: 2),
+                                borderSide: BorderSide(
+                                    color: isDarkMode
+                                        ? Color(0xFF2A2A3C)
+                                        : Colors.blue,
+                                    width: 2),
                               ),
                             ),
                           ),
@@ -157,18 +179,26 @@ class RegistrasiPasien extends StatelessWidget {
                               prefixIcon: const Icon(Icons.edit),
                               labelText: 'Nama Lengkap',
                               labelStyle: const TextStyle(color: Colors.grey),
-                              prefixIconColor: Colors.blue,
+                              filled: true,
+                              fillColor: Colors.white,
+                              prefixIconColor:
+                                  isDarkMode ? Color(0xFF2A2A3C) : Colors.blue,
                               contentPadding: const EdgeInsets.symmetric(
                                   vertical: 10, horizontal: 10),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
-                                borderSide:
-                                    const BorderSide(color: Color(0xFF2563EB)),
+                                borderSide: BorderSide(
+                                    color: isDarkMode
+                                        ? Color(0xFF2A2A3C)
+                                        : Color(0xFF2563EB)),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20),
-                                borderSide: const BorderSide(
-                                    color: Colors.blue, width: 2),
+                                borderSide: BorderSide(
+                                    color: isDarkMode
+                                        ? Color(0xFF2A2A3C)
+                                        : Colors.blue,
+                                    width: 2),
                               ),
                             ),
                           ),
@@ -179,18 +209,26 @@ class RegistrasiPasien extends StatelessWidget {
                               prefixIcon: const Icon(Icons.email),
                               labelText: 'Email',
                               labelStyle: const TextStyle(color: Colors.grey),
-                              prefixIconColor: Colors.blue,
+                              filled: true,
+                              fillColor: Colors.white,
+                              prefixIconColor:
+                                  isDarkMode ? Color(0xFF2A2A3C) : Colors.blue,
                               contentPadding: const EdgeInsets.symmetric(
                                   vertical: 10, horizontal: 10),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
-                                borderSide:
-                                    const BorderSide(color: Color(0xFF2563EB)),
+                                borderSide: BorderSide(
+                                    color: isDarkMode
+                                        ? Color(0xFF2A2A3C)
+                                        : Color(0xFF2563EB)),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20),
-                                borderSide: const BorderSide(
-                                    color: Colors.blue, width: 2),
+                                borderSide: BorderSide(
+                                    color: isDarkMode
+                                        ? Color(0xFF2A2A3C)
+                                        : Colors.blue,
+                                    width: 2),
                               ),
                             ),
                           ),
@@ -202,18 +240,26 @@ class RegistrasiPasien extends StatelessWidget {
                               prefixIcon: const Icon(Icons.lock),
                               labelText: 'Password',
                               labelStyle: const TextStyle(color: Colors.grey),
-                              prefixIconColor: Colors.blue,
+                              filled: true,
+                              fillColor: Colors.white,
+                              prefixIconColor:
+                                  isDarkMode ? Color(0xFF2A2A3C) : Colors.blue,
                               contentPadding: const EdgeInsets.symmetric(
                                   vertical: 10, horizontal: 10),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
-                                borderSide:
-                                    const BorderSide(color: Color(0xFF2563EB)),
+                                borderSide: BorderSide(
+                                    color: isDarkMode
+                                        ? Color(0xFF2A2A3C)
+                                        : Color(0xFF2563EB)),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20),
-                                borderSide: const BorderSide(
-                                    color: Colors.blue, width: 2),
+                                borderSide: BorderSide(
+                                    color: isDarkMode
+                                        ? Color(0xFF2A2A3C)
+                                        : Colors.blue,
+                                    width: 2),
                               ),
                             ),
                           ),
@@ -222,20 +268,28 @@ class RegistrasiPasien extends StatelessWidget {
                             controller: tanggalLahirController,
                             decoration: InputDecoration(
                               prefixIcon: const Icon(Icons.calendar_month),
-                              prefixIconColor: Colors.blue,
+                              filled: true,
+                              fillColor: Colors.white,
+                              prefixIconColor:
+                                  isDarkMode ? Color(0xFF2A2A3C) : Colors.blue,
                               labelText: 'Tanggal Lahir (DD/MM/YYYY)',
                               labelStyle: const TextStyle(color: Colors.grey),
                               contentPadding: const EdgeInsets.symmetric(
                                   vertical: 10, horizontal: 10),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
-                                borderSide:
-                                    const BorderSide(color: Color(0xFF2563EB)),
+                                borderSide: BorderSide(
+                                    color: isDarkMode
+                                        ? Color(0xFF2A2A3C)
+                                        : Color(0xFF2563EB)),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20),
-                                borderSide: const BorderSide(
-                                    color: Colors.blue, width: 2),
+                                borderSide: BorderSide(
+                                    color: isDarkMode
+                                        ? Color(0xFF2A2A3C)
+                                        : Colors.blue,
+                                    width: 2),
                               ),
                             ),
                           ),
@@ -244,24 +298,32 @@ class RegistrasiPasien extends StatelessWidget {
                             controller: jenisKelaminTextController,
                             decoration: InputDecoration(
                               prefixIcon: const Icon(Icons.wc_rounded),
-                              prefixIconColor: Colors.blue,
+                              filled: true,
+                              fillColor: Colors.white,
+                              prefixIconColor:
+                                  isDarkMode ? Color(0xFF2A2A3C) : Colors.blue,
                               labelText: 'Jenis Kelamin (L/P)',
                               labelStyle: const TextStyle(color: Colors.grey),
                               contentPadding: const EdgeInsets.symmetric(
                                   vertical: 10, horizontal: 10),
-                              enabledBorder: const OutlineInputBorder(
+                              enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.only(
                                     topLeft: Radius.circular(10),
                                     topRight: Radius.circular(10),
                                     bottomLeft: Radius.circular(25),
                                     bottomRight: Radius.circular(25)),
-                                borderSide:
-                                    BorderSide(color: Color(0xFF2563EB)),
+                                borderSide: BorderSide(
+                                    color: isDarkMode
+                                        ? Color(0xFF2A2A3C)
+                                        : Color(0xFF2563EB)),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20),
-                                borderSide: const BorderSide(
-                                    color: Colors.blue, width: 2),
+                                borderSide: BorderSide(
+                                    color: isDarkMode
+                                        ? Color(0xFF2A2A3C)
+                                        : Colors.blue,
+                                    width: 2),
                               ),
                             ),
                           ),
@@ -271,7 +333,9 @@ class RegistrasiPasien extends StatelessWidget {
                               daftarPasienInsert(context);
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF2563EB),
+                              backgroundColor: isDarkMode
+                                  ? Color.fromARGB(255, 38, 202, 197)
+                                  : const Color(0xFF2563EB),
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 60.0,
                               ),
@@ -279,10 +343,12 @@ class RegistrasiPasien extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(40),
                               ),
                             ),
-                            child: const Text(
+                            child: Text(
                               'Daftar',
                               style: TextStyle(
-                                  color: Colors.white,
+                                  color: isDarkMode
+                                      ? Color(0xFF2A2A3C)
+                                      : Colors.white,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 20),
                             ),
@@ -324,12 +390,15 @@ class RegistrasiPasien extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => Pilihrole()),
+                                builder: (context) =>
+                                    Pilihrole(someCondition: true)),
                           );
                         },
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.arrow_back_ios,
-                          color: Colors.white,
+                          color: isDarkMode
+                              ? Color.fromARGB(255, 38, 202, 197)
+                              : Colors.white,
                         )))
               ],
             ),
@@ -349,19 +418,23 @@ class RegistrasiPasien extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 1),
-                  const Text(
+                  Text(
                     'CERDIK',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: isDarkMode
+                          ? Color.fromARGB(255, 38, 202, 197)
+                          : Colors.white,
                       fontSize: 32,
                       fontWeight: FontWeight.normal,
                     ),
                   ),
                   const SizedBox(height: 10),
-                  const Text(
+                  Text(
                     'REGISTRASI',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: isDarkMode
+                          ? Color.fromARGB(255, 38, 202, 197)
+                          : Colors.white,
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
@@ -370,12 +443,17 @@ class RegistrasiPasien extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const Login()),
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const Login(someCondition: true)),
                       );
                     },
-                    child: const Text(
+                    child: Text(
                       'Sudah Punya Akun? Log in',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(
+                          color: isDarkMode
+                              ? Color.fromARGB(255, 38, 202, 197)
+                              : Colors.white),
                     ),
                   ),
                 ],

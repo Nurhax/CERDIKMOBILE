@@ -2,9 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:tubes/models/nakes.dart';
 import 'package:tubes/models/obat.dart';
 import 'pageDokter.dart';
+import 'package:provider/provider.dart';
+import 'theme_provider.dart'; // Import file yang dibuat
 
 void main() {
-  runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => ThemeProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -12,31 +19,52 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: AddMedicineScreen(
-        nakesSaatIni: Nakes(),
-      ),
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: themeProvider.currentTheme,
+          home: AddMedicineScreen(nakesSaatIni: Nakes(), someCondition: true),
+        );
+      },
     );
   }
 }
 
 class AddMedicineScreen extends StatelessWidget {
+  final bool someCondition;
   final Nakes nakesSaatIni;
   final TextEditingController _medicineNameController = TextEditingController();
 
-  AddMedicineScreen({super.key, required this.nakesSaatIni}); // Removed 'const'
+  AddMedicineScreen(
+      {super.key,
+      required this.someCondition,
+      required this.nakesSaatIni}); // Removed 'const'
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor:
+          isDarkMode ? Color.fromARGB(255, 182, 181, 181) : Colors.white,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (context) => pageDokter(
+                  initialIndex:
+                      2, // Set index ke 2 untuk membuka `tambahObatPage`
+                  nakesSaatIni: nakesSaatIni,
+                ),
+              ),
+              (route) => false, // Menghapus semua halaman sebelumnya
+            );
           },
         ),
       ),
@@ -55,7 +83,10 @@ class AddMedicineScreen extends StatelessWidget {
             const SizedBox(height: 38),
             const Text(
               "Obat Apa Yang Ingin Kamu Tambahkan",
-              style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 35),
@@ -64,22 +95,38 @@ class AddMedicineScreen extends StatelessWidget {
               controller: _medicineNameController,
               decoration: InputDecoration(
                 hintText: "Ketik nama obat",
-                hintStyle: const TextStyle(color: Colors.grey),
+                hintStyle: TextStyle(
+                  color: isDarkMode
+                      ? const Color.fromARGB(255, 51, 51, 51)
+                      : Colors.grey,
+                ),
                 fillColor: Colors.blue,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30.0),
-                  borderSide: const BorderSide(color: Colors.blue),
+                  borderSide: BorderSide(
+                    color: isDarkMode
+                        ? const Color.fromARGB(255, 51, 51, 51)
+                        : Colors.blue,
+                  ),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30.0),
-                  borderSide: const BorderSide(color: Colors.blue, width: 3.0),
+                  borderSide: BorderSide(
+                      color: isDarkMode
+                          ? const Color.fromARGB(255, 51, 51, 51)
+                          : Colors.blue,
+                      width: 3.0),
                 ),
               ),
             ),
             const SizedBox(height: 10),
-            const Text(
+            Text(
               "Ketikkan Obat Pada Kolom Di Atas",
-              style: TextStyle(color: Colors.grey, fontSize: 14),
+              style: TextStyle(
+                  color: isDarkMode
+                      ? const Color.fromARGB(255, 51, 51, 51)
+                      : Colors.grey,
+                  fontSize: 14),
             ),
             const SizedBox(height: 20),
             // Button
@@ -102,18 +149,20 @@ class AddMedicineScreen extends StatelessWidget {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0Xffbfdbfe),
+                  backgroundColor: isDarkMode
+                      ? const Color(0xFF2A2A3C)
+                      : const Color(0Xffbfdbfe),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(25.0),
                   ),
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
-                child: const Text(
+                child: Text(
                   "Lanjutkan",
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xff2563eb),
+                    color: isDarkMode ? Colors.white : Color(0xff2563eb),
                   ),
                 ),
               ),
@@ -141,6 +190,8 @@ class _JenisObatPageState extends State<JenisObatPage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -148,9 +199,18 @@ class _JenisObatPageState extends State<JenisObatPage> {
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
             Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => AddMedicineScreen(
+                        someCondition: true,
+                        nakesSaatIni: widget.nakesSaatIni,
+                      )),
+            );
           },
         ),
-        backgroundColor: Colors.white,
+        backgroundColor:
+            isDarkMode ? Color.fromARGB(255, 182, 181, 181) : Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 5.0),
@@ -191,8 +251,13 @@ class _JenisObatPageState extends State<JenisObatPage> {
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xff2563eb), Color(0xff60a5fa)],
+                  gradient: LinearGradient(
+                    colors: isDarkMode
+                        ? [
+                            Color(0xFF2A2A3C), // Warna gelap atas
+                            Color(0xFF2A2A3C), // Warna gelap bawah
+                          ]
+                        : [Color(0xff2563eb), Color(0xff60a5fa)],
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                   ),
@@ -229,17 +294,18 @@ class _JenisObatPageState extends State<JenisObatPage> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0Xffbfdbfe),
+                  backgroundColor:
+                      isDarkMode ? Color(0xFF2A2A3C) : Color(0Xffbfdbfe),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(25.0),
                   ),
                 ),
-                child: const Text(
+                child: Text(
                   "Lanjutkan",
                   style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xff2563eb)),
+                      color: isDarkMode ? Colors.white : Color(0xff2563eb)),
                 ),
               ),
             ),
@@ -247,13 +313,20 @@ class _JenisObatPageState extends State<JenisObatPage> {
           ],
         ),
       ),
-      backgroundColor: Colors.white,
+      backgroundColor:
+          isDarkMode ? Color.fromARGB(255, 182, 181, 181) : Colors.white,
     );
   }
 
   Widget _buildRadioItem(String title, IconData icon) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
     return ListTile(
-      leading: Icon(icon, size: 40, color: Colors.white),
+      leading: Icon(
+        icon,
+        size: 40,
+        color: isDarkMode ? Color(0xFF00FFF5) : Colors.white,
+      ),
       title: Text(title,
           style: const TextStyle(color: Colors.white, fontSize: 16)),
       trailing: Radio<String>(
@@ -264,7 +337,7 @@ class _JenisObatPageState extends State<JenisObatPage> {
             _selectedObat = value;
           });
         },
-        activeColor: Colors.white,
+        activeColor: isDarkMode ? Color(0xFF00FFF5) : Colors.white,
       ),
     );
   }
@@ -291,6 +364,8 @@ class _TambahDosisObatPageState extends State<TambahDosisObatPage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -306,7 +381,8 @@ class _TambahDosisObatPageState extends State<TambahDosisObatPage> {
             );
           },
         ),
-        backgroundColor: Colors.white,
+        backgroundColor:
+            isDarkMode ? Color.fromARGB(255, 182, 181, 181) : Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 5.0),
@@ -344,7 +420,11 @@ class _TambahDosisObatPageState extends State<TambahDosisObatPage> {
                 TextFormField(
                   decoration: InputDecoration(
                     hintText: "Ketik dosis obat",
-                    hintStyle: const TextStyle(color: Colors.grey),
+                    hintStyle: TextStyle(
+                      color: isDarkMode
+                          ? const Color.fromARGB(255, 51, 51, 51)
+                          : Colors.grey,
+                    ),
                     fillColor: Colors.blue,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30.0),
@@ -374,8 +454,13 @@ class _TambahDosisObatPageState extends State<TambahDosisObatPage> {
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xff2563eb), Color(0xff60a5fa)],
+                  gradient: LinearGradient(
+                    colors: isDarkMode
+                        ? [
+                            Color(0xFF2A2A3C), // Warna gelap atas
+                            Color(0xFF2A2A3C) // Warna gelap bawah
+                          ]
+                        : [Color(0xff2563eb), Color(0xff60a5fa)],
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                   ),
@@ -406,18 +491,19 @@ class _TambahDosisObatPageState extends State<TambahDosisObatPage> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0Xffbfdbfe),
+                  backgroundColor:
+                      isDarkMode ? Color(0xFF2A2A3C) : Color(0Xffbfdbfe),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(25.0),
                   ),
                   padding: const EdgeInsets.symmetric(vertical: 5),
                 ),
-                child: const Text(
+                child: Text(
                   "Lanjutkan",
                   style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xff2563eb)),
+                      color: isDarkMode ? Colors.white : Color(0xff2563eb)),
                 ),
               ),
             ),
@@ -425,11 +511,14 @@ class _TambahDosisObatPageState extends State<TambahDosisObatPage> {
           ],
         ),
       ),
-      backgroundColor: Colors.white,
+      backgroundColor:
+          isDarkMode ? Color.fromARGB(255, 182, 181, 181) : Colors.white,
     );
   }
 
   Widget _buildRadioItem(String title) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
     return ListTile(
       title: Text(
         title,
@@ -443,7 +532,7 @@ class _TambahDosisObatPageState extends State<TambahDosisObatPage> {
             _selectedDosis = value;
           });
         },
-        activeColor: Colors.white,
+        activeColor: isDarkMode ? Color(0xFF00FFF5) : Colors.white,
       ),
     );
   }
@@ -470,10 +559,14 @@ class _FormDataObatState extends State<FormDataObat> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor:
+          isDarkMode ? Color.fromARGB(255, 182, 181, 181) : Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor:
+            isDarkMode ? Color.fromARGB(255, 182, 181, 181) : Colors.white,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
@@ -505,6 +598,11 @@ class _FormDataObatState extends State<FormDataObat> {
                       initialValue: _obatName,
                       decoration: InputDecoration(
                         labelText: 'Nama Obat',
+                        labelStyle: TextStyle(
+                          color: isDarkMode
+                              ? const Color.fromARGB(255, 51, 51, 51)
+                              : Colors.grey,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: const BorderSide(color: Colors.blue),
@@ -527,6 +625,11 @@ class _FormDataObatState extends State<FormDataObat> {
                       initialValue: _dosis,
                       decoration: InputDecoration(
                         labelText: 'Dosis Obat',
+                        labelStyle: TextStyle(
+                          color: isDarkMode
+                              ? const Color.fromARGB(255, 51, 51, 51)
+                              : Colors.grey,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: const BorderSide(color: Colors.blue),
@@ -549,6 +652,11 @@ class _FormDataObatState extends State<FormDataObat> {
                       initialValue: _jenisObat,
                       decoration: InputDecoration(
                         labelText: 'Jenis Obat',
+                        labelStyle: TextStyle(
+                          color: isDarkMode
+                              ? const Color.fromARGB(255, 51, 51, 51)
+                              : Colors.grey,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: const BorderSide(color: Colors.blue),
@@ -571,6 +679,11 @@ class _FormDataObatState extends State<FormDataObat> {
                       initialValue: _satuan,
                       decoration: InputDecoration(
                         labelText: 'Satuan',
+                        labelStyle: TextStyle(
+                          color: isDarkMode
+                              ? const Color.fromARGB(255, 51, 51, 51)
+                              : Colors.grey,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: const BorderSide(color: Colors.blue),
@@ -595,6 +708,11 @@ class _FormDataObatState extends State<FormDataObat> {
                       initialValue: _gejala,
                       decoration: InputDecoration(
                         labelText: 'Gejala Obat',
+                        labelStyle: TextStyle(
+                          color: isDarkMode
+                              ? const Color.fromARGB(255, 51, 51, 51)
+                              : Colors.grey,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: const BorderSide(color: Colors.blue),
@@ -611,6 +729,11 @@ class _FormDataObatState extends State<FormDataObat> {
                       initialValue: _deskripsi,
                       decoration: InputDecoration(
                         labelText: 'Deskripsi',
+                        labelStyle: TextStyle(
+                          color: isDarkMode
+                              ? const Color.fromARGB(255, 51, 51, 51)
+                              : Colors.grey,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: const BorderSide(color: Colors.blue),
@@ -672,18 +795,22 @@ class _FormDataObatState extends State<FormDataObat> {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0Xffbfdbfe),
+                          backgroundColor: isDarkMode
+                              ? Color(0xFF2A2A3C)
+                              : Color(0Xffbfdbfe),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(25.0),
                           ),
                           padding: const EdgeInsets.symmetric(vertical: 16),
                         ),
-                        child: const Text(
+                        child: Text(
                           "Simpan Data Obat",
                           style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xff2563eb)),
+                              color: isDarkMode
+                                  ? Colors.white
+                                  : Color(0xff2563eb)),
                         ),
                       ),
                     ),
@@ -946,47 +1073,46 @@ class EditFormDataObat extends StatelessWidget {
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
-                child:ElevatedButton(
-  onPressed: () {
-    print("Submitting Data:");
-    print("Nama Obat: " + obatNameController.text);
-    print("Dosis: " + dosisController.text);
-    print("Jenis Obat:" + jenisObatController.text);
-    print("Satuan: " + ukuranController.text);
-    print("Gejala: " + gejalaObatController.text);
-    print("Deskripsi: " + deskripsiController.text);
+                child: ElevatedButton(
+                  onPressed: () {
+                    print("Submitting Data:");
+                    print("Nama Obat: " + obatNameController.text);
+                    print("Dosis: " + dosisController.text);
+                    print("Jenis Obat:" + jenisObatController.text);
+                    print("Satuan: " + ukuranController.text);
+                    print("Gejala: " + gejalaObatController.text);
+                    print("Deskripsi: " + deskripsiController.text);
 
-    // Pass the 'id' along with other details
-    Obat.updateObatData(
-      obatId,  // Pass the obat ID
-      obatNameController.text,
-      jenisObatController.text,
-      dosisController.text,
-      deskripsiController.text,
-      gejalaObatController.text,
-      ukuranController.text,
-    );
+                    // Pass the 'id' along with other details
+                    Obat.updateObatData(
+                      obatId, // Pass the obat ID
+                      obatNameController.text,
+                      jenisObatController.text,
+                      dosisController.text,
+                      deskripsiController.text,
+                      gejalaObatController.text,
+                      ukuranController.text,
+                    );
 
-    print("Data updated successfully!");
-    // Close the page on success
-    Navigator.pop(context);
-  },
-  style: ElevatedButton.styleFrom(
-    backgroundColor: const Color(0Xffbfdbfe),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(25.0),
-    ),
-    padding: const EdgeInsets.symmetric(vertical: 16),
-  ),
-  child: const Text(
-    "Edit Obat",
-    style: TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.bold,
-        color: Color(0xff2563eb)),
-  ),
-),
-
+                    print("Data updated successfully!");
+                    // Close the page on success
+                    Navigator.pop(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0Xffbfdbfe),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25.0),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                  child: const Text(
+                    "Edit Obat",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xff2563eb)),
+                  ),
+                ),
               ),
             ],
           ),
