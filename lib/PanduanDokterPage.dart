@@ -1,172 +1,94 @@
 import 'package:flutter/material.dart';
-import 'package:tubes/pageDokter.dart';
-import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
-import 'package:provider/provider.dart';
-import 'theme_provider.dart'; // Import file yang dibuat
 
-void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => ThemeProvider(),
-      child: const PanduanDokter(someCondition: true),
-    ),
-  );
-}
+class PanduanDokter {
+  static void showGuideDialog(BuildContext context) {
+    // Daftar panduan
+    final List<String> guidePages = [
+      '1. Beranda Dokter:\n   - Di halaman ini, Anda dapat melihat jadwal pasien anda.\n   - Terdapat search untuk mencari nama pasien anda.',
+      '2. Tambah Jadwal Pasien:\n   - Di halaman ini, Anda dapat menambahkan jadwal pasien yang terdiri dari data pasien, obat yang harus pasien minum.',
+      '3. Data Obat:\n   - Di halaman ini, Anda dapat melihat informasi obat.\n   - Anda dapat menambahkan data obat yang terdiri dari nama obat,dosis obat,jenis obat, gambar obat , dan deskripsi obat.\n   - Terdapat search untuk mencari nama obat yang anda inginkan.',
+      '4. Profil Pasien:\n   - Di halaman ini, Anda dapat melihat informasi profil Anda.\n   - Anda juga dapat mengakses pengaturan dan personalisasi dari sini.\n   - Anda juga dapat mengakses pusat bantuan untuk memberikan jawaban untuk pertanyaan umum (FAQ).',
+    ];
 
-class PanduanItem {
-  final String gambarPath;
-  final String deskripsi;
+    // Menggunakan PageController untuk mengelola halaman
+    PageController pageController = PageController();
+    int currentPage = 0;
 
-  PanduanItem({required this.gambarPath, required this.deskripsi});
-}
-
-class PanduanDokter extends StatefulWidget {
-  final bool someCondition;
-  const PanduanDokter({
-    super.key,
-    required this.someCondition,
-  });
-  @override
-  _PanduanDokterState createState() => _PanduanDokterState();
-}
-
-class _PanduanDokterState extends State<PanduanDokter> {
-  int _currentStep = 0;
-
-  final List<PanduanItem> _panduanList = [
-    PanduanItem(
-      gambarPath: 'img/homebutton.png',
-      deskripsi: 'Ikon tersebut digunakan untuk menampilkan tampilan dari home',
-    ),
-    PanduanItem(
-      gambarPath: 'img/tambahjadwal.png',
-      deskripsi:
-          'Ikon tersebut digunakan untuk menampilkan tampilan tambah jadwal minum obat pasien',
-    ),
-    PanduanItem(
-      gambarPath: 'img/pageobat.png',
-      deskripsi:
-          'Ikon tersebut digunakan untuk menampilkan data obat yang tersedia dalam database obat',
-    ),
-    PanduanItem(
-      gambarPath: 'img/morepage.png',
-      deskripsi:
-          'Ikon tersebut digunakan untuk menampilkan fitur profile,personalisasi,pemandu,dan pusat bantuan',
-    ),
-    PanduanItem(
-      gambarPath: 'img/tambahobat.png',
-      deskripsi: 'Ikon tersebut digunakan untuk menambahkan data obat',
-    ),
-    PanduanItem(
-      gambarPath: 'img/profileIcon.png',
-      deskripsi: 'Profile digunakan untuk menampilkan data - data dari user',
-    ),
-    PanduanItem(
-      gambarPath: 'img/personalisasiIcon.png',
-      deskripsi:
-          'Personalisasi digunakan untuk mengubah tema dari aplikasi dengan pilihan light mode atau dark mode',
-    ),
-    PanduanItem(
-      gambarPath: 'img/Pusatbantuan.png',
-      deskripsi:
-          'Pusat bantuan digunakan untuk chat dengan chatbot yang sudah disediakan oleh sistem',
-    ),
-    PanduanItem(
-      gambarPath: 'img/loadingbody1.png',
-      deskripsi: 'Panduan selesai, selamat mencoba!',
-    ),
-  ];
-
-  void _nextStep() {
-    if (_currentStep < _panduanList.length - 1) {
-      setState(() {
-        _currentStep++;
-      });
-    } else {
-      Navigator.of(context).pop(); // Keluar dari dialog
-    }
-  }
-
-  void _prevStep() {
-    if (_currentStep > 0) {
-      setState(() {
-        _currentStep--;
-      });
-    }
-  }
-
-  void _lewatiPanduan() {
-    Navigator.of(context).pop();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
-    final current = _panduanList[_currentStep];
-
-    return AlertDialog(
-      backgroundColor:
-          isDarkMode ? Color.fromARGB(255, 182, 181, 181) : Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      contentPadding: const EdgeInsets.all(20),
-      content: Container(
-        width: 300, // Tetapkan lebar tetap
-        height: 330, // Tetapkan tinggi tetap
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset(
-              current.gambarPath,
-              height: 150,
-              fit: BoxFit.contain,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              current.deskripsi,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  fontSize: 18,
-                  color: isDarkMode ? Color(0xFF2A2A3C) : Colors.black),
-            ),
-            const Spacer(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ElevatedButton(
-                  onPressed: _prevStep,
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: isDarkMode
-                          ? Color(0xFF2A2A3C)
-                          : const Color.fromARGB(255, 37, 105, 255)),
-                  child: const Text('Prev'),
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              backgroundColor: const Color.fromARGB(255, 23, 85, 221),
+              title: const Text(
+                'Panduan Penggunaan',
+                style: TextStyle(color: Colors.white),
+              ),
+              content: SizedBox(
+                width: double.maxFinite,
+                height: 150,
+                child: PageView.builder(
+                  controller: pageController,
+                  itemCount: guidePages.length,
+                  onPageChanged: (index) {
+                    setState(() {
+                      currentPage = index;
+                    });
+                  },
+                  itemBuilder: (context, index) {
+                    return SingleChildScrollView(
+                      child: ListBody(
+                        children: <Widget>[
+                          Text(
+                            guidePages[index],
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
-                ElevatedButton(
-                  onPressed: _lewatiPanduan,
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              ),
+              actions: <Widget>[
+                TextButton(
                   child: const Text(
-                    'Lewati',
+                    'Tutup',
                     style: TextStyle(color: Colors.white),
                   ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
                 ),
-                ElevatedButton(
-                  onPressed: _nextStep,
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: isDarkMode
-                          ? Color(0xFF2A2A3C)
-                          : const Color.fromARGB(255, 37, 105, 255)),
-                  child: Text(
-                    _currentStep == _panduanList.length - 1
-                        ? 'Selesai'
-                        : 'Next',
-                  ),
+                TextButton(
+                  child:
+                      const Text('Prev', style: TextStyle(color: Colors.white)),
+                  onPressed: currentPage > 0
+                      ? () {
+                          pageController.previousPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        }
+                      : null,
+                ),
+                TextButton(
+                  child:
+                      const Text('Next', style: TextStyle(color: Colors.white)),
+                  onPressed: currentPage < guidePages.length - 1
+                      ? () {
+                          pageController.nextPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        }
+                      : null,
                 ),
               ],
-            )
-          ],
-        ),
-      ),
+            );
+          },
+        );
+      },
     );
   }
 }

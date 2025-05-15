@@ -1,20 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:tubes/pilihRole.dart';
-import 'package:provider/provider.dart';
-import 'theme_provider.dart'; // Import file yang dibuat
-import 'package:tubes/Notification/noti_service.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  //init Notfications
-  NotiService().initNotification();
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => ThemeProvider(),
-      child: const MyApp(),
-    ),
-  );
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -22,36 +10,27 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, child) {
-        return MaterialApp(
-          title: 'Cerdik',
-          debugShowCheckedModeBanner: false,
-          theme: themeProvider.currentTheme,
-          home: HomePage(someCondition: true),
-        );
-      },
+    return MaterialApp(
+      title: 'Cerdik',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: HomePage(),
     );
   }
 }
 
 class HomePage extends StatelessWidget {
-  final bool someCondition;
-  const HomePage({super.key, required this.someCondition});
+  const HomePage({super.key});
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              isDarkMode ? Color(0xFF2A2A3C) : Colors.blue[300]!,
-              isDarkMode ? Color(0xFF2A2A3C) : Colors.blue[700]!
-            ],
+            colors: [Colors.blue[300]!, Colors.blue[700]!],
           ),
         ),
         child: Column(
@@ -83,9 +62,7 @@ class HomePage extends StatelessWidget {
                       Shadow(
                         offset: Offset(1.0, 1.0),
                         blurRadius: 12.0,
-                        color: isDarkMode
-                            ? Color.fromARGB(255, 38, 202, 197)
-                            : Color.fromARGB(255, 255, 255, 255),
+                        color: Color.fromARGB(255, 255, 255, 255),
                       ),
                     ],
                   ),
@@ -100,17 +77,13 @@ class HomePage extends StatelessWidget {
                       textAlign: TextAlign.left,
                       style: TextStyle(
                         fontSize: 40,
-                        color: isDarkMode
-                            ? Color.fromARGB(255, 38, 202, 197)
-                            : Colors.white,
+                        color: Colors.white,
                         fontWeight: FontWeight.w600,
                         shadows: [
                           Shadow(
                             offset: Offset(1.0, 1.0),
                             blurRadius: 12.0,
-                            color: isDarkMode
-                                ? Color.fromARGB(255, 38, 202, 197)
-                                : Color.fromARGB(255, 255, 255, 255),
+                            color: Color.fromARGB(255, 255, 255, 255),
                           ),
                         ],
                       ),
@@ -122,8 +95,7 @@ class HomePage extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) => Pilihrole(someCondition: true)),
+                      MaterialPageRoute(builder: (context) => Pilihrole()),
                     );
                   },
                   child: Text(
@@ -131,10 +103,8 @@ class HomePage extends StatelessWidget {
                     style: TextStyle(fontSize: 20),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: isDarkMode
-                        ? Color.fromARGB(255, 38, 202, 197)
-                        : Colors.white,
-                    foregroundColor: isDarkMode ? Colors.white : Colors.blue,
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.blue,
                     padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),

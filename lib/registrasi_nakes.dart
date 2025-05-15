@@ -1,29 +1,16 @@
 import 'dart:convert';
 
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:tubes/login.dart';
 import 'package:tubes/pilihRole.dart';
 import 'package:http/http.dart' as http;
-import 'Security/hashing_service.dart';
-import 'package:provider/provider.dart';
-import 'theme_provider.dart'; // Import file yang dibuat
 
 void main() {
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => ThemeProvider(),
-      child: RegistrasiNakes(someCondition: true),
-    ),
-  );
+  runApp(RegistrasiNakes());
 }
 
 class RegistrasiNakes extends StatelessWidget {
-  final bool someCondition;
-  RegistrasiNakes({
-    super.key,
-    required this.someCondition,
-  });
+  RegistrasiNakes({super.key});
 
   final TextEditingController usernameTextController = TextEditingController();
   final TextEditingController namaLengkapTextController =
@@ -32,84 +19,54 @@ class RegistrasiNakes extends StatelessWidget {
   final TextEditingController passwordTextController = TextEditingController();
   final TextEditingController nomorSTRTextController = TextEditingController();
 
-  void showErrorDialog(BuildContext context, String message) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Register Error"),
-          content: Text(message),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text("OK"),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   Future<void> daftarNakesInsert(BuildContext context) async {
     if (usernameTextController.text.isNotEmpty &&
         namaLengkapTextController.text.isNotEmpty &&
         emailTextController.text.isNotEmpty &&
         passwordTextController.text.isNotEmpty &&
-        nomorSTRTextController.text.isNotEmpty) {
+        nomorSTRTextController.text.isNotEmpty &&
+        nomorSTRTextController.text.length == 7) {
       try {
-        if (nomorSTRTextController.text.length != 7) {
-          showErrorDialog(context, "Nomor STR Tidak Valid Harus 7 Digit!");
-        } else if (emailTextController.text.contains("@")) {
-          showErrorDialog(context, "Email Tidak Valid, Input Kembali Email!");
-        } else {
-          String uri = "http://10.0.2.2/APIPPB/insert_record_nakes.php";
-          var res = await http.post(Uri.parse(uri), body: {
-            "username": usernameTextController.text.trim(),
-            "nama": namaLengkapTextController.text.trim(),
-            "email": emailTextController.text.trim(),
-            "password":
-                HashingService.hashPassword(passwordTextController.text.trim()),
-            "nomorSTR": nomorSTRTextController.text.trim()
-          });
-          //Nomor STR harus 7 angka
-          if (res.statusCode == 200) {
-            var response = jsonDecode(res.body);
-            if (response["success"] == "true") {
-              debugPrint("Record Insert Successfull");
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Registrasi Nakes Berhasil!')),
-              );
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const Login(someCondition: true)),
-              );
-            } else {
-              debugPrint("Error ${response}");
-            }
+        String uri = "http://10.0.2.2/APIPPB/insert_record_nakes.php";
+        var res = await http.post(Uri.parse(uri), body: {
+          "username": usernameTextController.text.trim(),
+          "nama": namaLengkapTextController.text.trim(),
+          "email": emailTextController.text.trim(),
+          "password": passwordTextController.text.trim(),
+          "nomorSTR": nomorSTRTextController.text.trim()
+        });
+        //Nomor STR harus 7 angka
+        if (res.statusCode == 200) {
+          var response = jsonDecode(res.body);
+          if (response["success"] == "true") {
+            debugPrint("Record Insert Successfull");
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Registrasi Nakes Berhasil!')),
+            );
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const Login()),
+            );
           } else {
-            debugPrint("Error: ${res.statusCode}, ${res.body}");
+            debugPrint("Error ${response}");
           }
+        } else {
+          debugPrint("Error: ${res.statusCode}, ${res.body}");
         }
       } catch (e) {
         print("ERROR! $e");
       }
     } else {
-      print("Tolong Lengkapi Data Terlebih Dahulu!");
-      showErrorDialog(context, "DATA BELUM LENGKAP!");
+      print("TOLONG LENGKAPI DATA TERLEBIH DAHULU!");
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
     return MaterialApp(
       home: Scaffold(
         resizeToAvoidBottomInset: true,
-        backgroundColor: isDarkMode ? Color(0xFF2A2A3C) : Color(0xFF2563EB),
+        backgroundColor: const Color(0xFF2563EB),
         body: Stack(
           children: [
             Positioned(
@@ -118,10 +75,8 @@ class RegistrasiNakes extends StatelessWidget {
               right: 0,
               child: Container(
                 height: 480,
-                decoration: BoxDecoration(
-                  color: isDarkMode
-                      ? const Color.fromARGB(255, 202, 201, 201)
-                      : Colors.white,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(30),
                     topRight: Radius.circular(30),
@@ -139,35 +94,24 @@ class RegistrasiNakes extends StatelessWidget {
                             controller: usernameTextController,
                             decoration: InputDecoration(
                               prefixIcon: const Icon(Icons.person),
-                              filled: true,
-                              fillColor: Colors.white,
-                              prefixIconColor:
-                                  isDarkMode ? Color(0xFF2A2A3C) : Colors.blue,
+                              prefixIconColor: Colors.blue,
                               labelText: 'Username',
-                              labelStyle: TextStyle(
-                                  color: isDarkMode
-                                      ? Color(0xFF2A2A3C)
-                                      : Colors.grey),
+                              labelStyle: const TextStyle(color: Colors.grey),
                               contentPadding: const EdgeInsets.symmetric(
                                   vertical: 5, horizontal: 10),
-                              enabledBorder: OutlineInputBorder(
+                              enabledBorder: const OutlineInputBorder(
                                 borderRadius: BorderRadius.only(
                                     topLeft: Radius.circular(25),
                                     topRight: Radius.circular(25),
                                     bottomLeft: Radius.circular(10),
                                     bottomRight: Radius.circular(10)),
-                                borderSide: BorderSide(
-                                    color: isDarkMode
-                                        ? Color(0xFF2A2A3C)
-                                        : Color(0xFF2563EB)),
+                                borderSide:
+                                    BorderSide(color: Color(0xFF2563EB)),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20),
-                                borderSide: BorderSide(
-                                    color: isDarkMode
-                                        ? Color(0xFF2A2A3C)
-                                        : Colors.blue,
-                                    width: 2),
+                                borderSide: const BorderSide(
+                                    color: Colors.blue, width: 2),
                               ),
                             ),
                           ),
@@ -176,31 +120,20 @@ class RegistrasiNakes extends StatelessWidget {
                             controller: namaLengkapTextController,
                             decoration: InputDecoration(
                               prefixIcon: const Icon(Icons.edit),
-                              filled: true,
-                              fillColor: Colors.white,
                               labelText: 'Nama Lengkap',
-                              labelStyle: TextStyle(
-                                  color: isDarkMode
-                                      ? Color(0xFF2A2A3C)
-                                      : Colors.grey),
-                              prefixIconColor:
-                                  isDarkMode ? Color(0xFF2A2A3C) : Colors.blue,
+                              labelStyle: const TextStyle(color: Colors.grey),
+                              prefixIconColor: Colors.blue,
                               contentPadding: const EdgeInsets.symmetric(
                                   vertical: 10, horizontal: 10),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(
-                                    color: isDarkMode
-                                        ? Color(0xFF2A2A3C)
-                                        : Color(0xFF2563EB)),
+                                borderSide:
+                                    const BorderSide(color: Color(0xFF2563EB)),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20),
-                                borderSide: BorderSide(
-                                    color: isDarkMode
-                                        ? Color(0xFF2A2A3C)
-                                        : Colors.blue,
-                                    width: 2),
+                                borderSide: const BorderSide(
+                                    color: Colors.blue, width: 2),
                               ),
                             ),
                           ),
@@ -209,31 +142,20 @@ class RegistrasiNakes extends StatelessWidget {
                             controller: emailTextController,
                             decoration: InputDecoration(
                               prefixIcon: const Icon(Icons.email),
-                              filled: true,
-                              fillColor: Colors.white,
                               labelText: 'Email',
-                              labelStyle: TextStyle(
-                                  color: isDarkMode
-                                      ? Color(0xFF2A2A3C)
-                                      : Colors.grey),
-                              prefixIconColor:
-                                  isDarkMode ? Color(0xFF2A2A3C) : Colors.blue,
+                              labelStyle: const TextStyle(color: Colors.grey),
+                              prefixIconColor: Colors.blue,
                               contentPadding: const EdgeInsets.symmetric(
                                   vertical: 10, horizontal: 10),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(
-                                    color: isDarkMode
-                                        ? Color(0xFF2A2A3C)
-                                        : Color(0xFF2563EB)),
+                                borderSide:
+                                    const BorderSide(color: Color(0xFF2563EB)),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20),
-                                borderSide: BorderSide(
-                                    color: isDarkMode
-                                        ? Color(0xFF2A2A3C)
-                                        : Colors.blue,
-                                    width: 2),
+                                borderSide: const BorderSide(
+                                    color: Colors.blue, width: 2),
                               ),
                             ),
                           ),
@@ -243,31 +165,20 @@ class RegistrasiNakes extends StatelessWidget {
                             obscureText: true,
                             decoration: InputDecoration(
                               prefixIcon: const Icon(Icons.lock),
-                              filled: true,
-                              fillColor: Colors.white,
                               labelText: 'Password',
-                              labelStyle: TextStyle(
-                                  color: isDarkMode
-                                      ? Color(0xFF2A2A3C)
-                                      : Colors.grey),
-                              prefixIconColor:
-                                  isDarkMode ? Color(0xFF2A2A3C) : Colors.blue,
+                              labelStyle: const TextStyle(color: Colors.grey),
+                              prefixIconColor: Colors.blue,
                               contentPadding: const EdgeInsets.symmetric(
                                   vertical: 10, horizontal: 10),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(
-                                    color: isDarkMode
-                                        ? Color(0xFF2A2A3C)
-                                        : Color(0xFF2563EB)),
+                                borderSide:
+                                    const BorderSide(color: Color(0xFF2563EB)),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20),
-                                borderSide: BorderSide(
-                                    color: isDarkMode
-                                        ? Color(0xFF2A2A3C)
-                                        : Colors.blue,
-                                    width: 2),
+                                borderSide: const BorderSide(
+                                    color: Colors.blue, width: 2),
                               ),
                             ),
                           ),
@@ -276,35 +187,24 @@ class RegistrasiNakes extends StatelessWidget {
                             controller: nomorSTRTextController,
                             decoration: InputDecoration(
                               prefixIcon: const Icon(Icons.credit_card),
-                              filled: true,
-                              fillColor: Colors.white,
-                              prefixIconColor:
-                                  isDarkMode ? Color(0xFF2A2A3C) : Colors.blue,
+                              prefixIconColor: Colors.blue,
                               labelText: 'Nomor STR',
-                              labelStyle: TextStyle(
-                                  color: isDarkMode
-                                      ? Color(0xFF2A2A3C)
-                                      : Colors.grey),
+                              labelStyle: const TextStyle(color: Colors.grey),
                               contentPadding: const EdgeInsets.symmetric(
                                   vertical: 10, horizontal: 10),
-                              enabledBorder: OutlineInputBorder(
+                              enabledBorder: const OutlineInputBorder(
                                 borderRadius: BorderRadius.only(
                                     topLeft: Radius.circular(10),
                                     topRight: Radius.circular(10),
                                     bottomLeft: Radius.circular(25),
                                     bottomRight: Radius.circular(25)),
-                                borderSide: BorderSide(
-                                    color: isDarkMode
-                                        ? Color(0xFF2A2A3C)
-                                        : Color(0xFF2563EB)),
+                                borderSide:
+                                    BorderSide(color: Color(0xFF2563EB)),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20),
-                                borderSide: BorderSide(
-                                    color: isDarkMode
-                                        ? Color(0xFF2A2A3C)
-                                        : Colors.blue,
-                                    width: 2),
+                                borderSide: const BorderSide(
+                                    color: Colors.blue, width: 2),
                               ),
                             ),
                           ),
@@ -315,9 +215,7 @@ class RegistrasiNakes extends StatelessWidget {
                               daftarNakesInsert(context);
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: isDarkMode
-                                  ? Color.fromARGB(255, 38, 202, 197)
-                                  : const Color(0xFF2563EB),
+                              backgroundColor: const Color(0xFF2563EB),
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 60.0,
                               ),
@@ -325,12 +223,10 @@ class RegistrasiNakes extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(40),
                               ),
                             ),
-                            child: Text(
+                            child: const Text(
                               'Daftar',
                               style: TextStyle(
-                                  color: isDarkMode
-                                      ? Color(0xFF2A2A3C)
-                                      : Colors.white,
+                                  color: Colors.white,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 20),
                             ),
@@ -372,15 +268,12 @@ class RegistrasiNakes extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) =>
-                                    Pilihrole(someCondition: true)),
+                                builder: (context) => Pilihrole()),
                           );
                         },
-                        icon: Icon(
+                        icon: const Icon(
                           Icons.arrow_back_ios,
-                          color: isDarkMode
-                              ? Color.fromARGB(255, 38, 202, 197)
-                              : Colors.white,
+                          color: Colors.white,
                         )))
               ],
             ),
@@ -400,23 +293,19 @@ class RegistrasiNakes extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 1),
-                  Text(
+                  const Text(
                     'CERDIK',
                     style: TextStyle(
-                      color: isDarkMode
-                          ? Color.fromARGB(255, 38, 202, 197)
-                          : Colors.white,
+                      color: Colors.white,
                       fontSize: 32,
                       fontWeight: FontWeight.normal,
                     ),
                   ),
                   const SizedBox(height: 10),
-                  Text(
+                  const Text(
                     'REGISTRASI',
                     style: TextStyle(
-                      color: isDarkMode
-                          ? Color.fromARGB(255, 38, 202, 197)
-                          : Colors.white,
+                      color: Colors.white,
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
@@ -425,18 +314,12 @@ class RegistrasiNakes extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) => const Login(
-                                  someCondition: true,
-                                )),
+                        MaterialPageRoute(builder: (context) => const Login()),
                       );
                     },
-                    child: Text(
+                    child: const Text(
                       'Sudah Punya Akun? Log in',
-                      style: TextStyle(
-                          color: isDarkMode
-                              ? Color.fromARGB(255, 38, 202, 197)
-                              : Colors.white),
+                      style: TextStyle(color: Colors.white),
                     ),
                   ),
                 ],

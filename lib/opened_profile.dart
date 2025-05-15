@@ -2,16 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:tubes/login.dart';
 import 'package:tubes/models/nakes.dart';
 import 'package:tubes/models/pasien.dart';
-import 'package:provider/provider.dart';
-import 'theme_provider.dart'; // Import file yang dibuat
 
 void main() {
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => ThemeProvider(),
-      child: const MyApp(),
-    ),
-  );
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -19,44 +12,32 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, child) {
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          theme: themeProvider.currentTheme,
-          home: ProfileScreen.pasien(
-              pasienSaatini: Pasien(), someCondition: true),
-        );
-      },
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: ProfileScreen.pasien(pasienSaatini: Pasien()),
     );
   }
 }
 
 class ProfileScreen extends StatelessWidget {
-  final bool someCondition;
   final Pasien? pasienSaatini;
   final Nakes? nakesSaatini;
-  const ProfileScreen.pasien(
-      {super.key, required this.someCondition, required this.pasienSaatini})
+  const ProfileScreen.pasien({super.key, required this.pasienSaatini})
       : nakesSaatini = null;
   @override
-  const ProfileScreen.nakes(
-      {super.key, required this.someCondition, required this.nakesSaatini})
+  const ProfileScreen.nakes({super.key, required this.nakesSaatini})
       : pasienSaatini = null;
   //isiNakes
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
     return Scaffold(
-      backgroundColor:
-          isDarkMode ? Color.fromARGB(255, 182, 181, 181) : Colors.white,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: isDarkMode ? Color(0xFF2A2A3C) : Colors.blue[400],
+        backgroundColor: Color.fromARGB(255, 37, 100, 235),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -72,10 +53,10 @@ class ProfileScreen extends StatelessWidget {
               Container(
                 height: 180,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: [
-                    isDarkMode ? Color(0xFF2A2A3C) : Colors.blue[400]!,
-                    isDarkMode ? Color(0xFF2A2A3C) : Colors.blue[600]!
-                  ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+                  gradient: LinearGradient(
+                      colors: [Color.fromARGB(255, 37, 100, 235)!, Color.fromARGB(255, 70, 122, 238)!],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter),
                   borderRadius: BorderRadius.vertical(
                     bottom: Radius.elliptical(
                       MediaQuery.of(context).size.width,
@@ -90,10 +71,7 @@ class ProfileScreen extends StatelessWidget {
                   padding: EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(
-                        color:
-                            isDarkMode ? Color(0xFF00FFF5) : Colors.blue[400]!,
-                        width: 3),
+                    border: Border.all(color: Color.fromARGB(255, 70, 122, 238)!, width: 3),
                     color: Colors.white,
                   ),
                   child: CircleAvatar(
@@ -102,7 +80,7 @@ class ProfileScreen extends StatelessWidget {
                     child: Icon(
                       Icons.person,
                       size: 50,
-                      color: isDarkMode ? Color(0xFF00FFF5) : Colors.blue[400],
+                      color: Color.fromARGB(255, 37, 100, 235),
                     ),
                   ),
                 ),
@@ -119,25 +97,21 @@ class ProfileScreen extends StatelessWidget {
               children: [
                 if (pasienSaatini != null) ...[
                   _buildProfileField(
-                      Icons.person, '${pasienSaatini!.username}', context),
+                      Icons.person, '${pasienSaatini!.username}'),
+                  _buildProfileField(Icons.edit, '${pasienSaatini!.nama}'),
+                  _buildProfileField(Icons.email, '${pasienSaatini!.email}'),
                   _buildProfileField(
-                      Icons.edit, '${pasienSaatini!.nama}', context),
+                      Icons.calendar_today, '${pasienSaatini!.usia}'),
                   _buildProfileField(
-                      Icons.email, '${pasienSaatini!.email}', context),
-                  _buildProfileField(
-                      Icons.calendar_today, '${pasienSaatini!.usia}', context),
-                  _buildProfileField(
-                      Icons.person_outline, '${pasienSaatini!.gender}', context)
+                      Icons.person_outline, '${pasienSaatini!.gender}')
                 ],
                 if (nakesSaatini != null) ...[
+                  _buildProfileField(Icons.person, '${nakesSaatini!.username}'),
                   _buildProfileField(
-                      Icons.person, '${nakesSaatini!.username}', context),
+                      Icons.edit, '${nakesSaatini!.namaLengkap}'),
                   _buildProfileField(
-                      Icons.edit, '${nakesSaatini!.namaLengkap}', context),
-                  _buildProfileField(
-                      Icons.no_accounts, '${nakesSaatini!.nomorSTR}', context),
-                  _buildProfileField(
-                      Icons.email, '${nakesSaatini!.email}', context),
+                      Icons.no_accounts, '${nakesSaatini!.nomorSTR}'),
+                  _buildProfileField(Icons.email, '${nakesSaatini!.email}'),
                 ]
               ],
             ),
@@ -152,12 +126,11 @@ class ProfileScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => const Login(someCondition: true)),
+                  MaterialPageRoute(builder: (context) => const Login()),
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red.shade300,
+                backgroundColor: Colors.red.shade400,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                 shape: RoundedRectangleBorder(
@@ -175,26 +148,22 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileField(IconData icon, String text, BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
+  Widget _buildProfileField(IconData icon, String text) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        border: Border.all(
-            color: isDarkMode ? Color(0xFF2A2A3C) : Colors.blue.shade200),
+        border: Border.all(color: Color.fromARGB(255, 37, 100, 235)),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
         children: [
-          Icon(icon, color: isDarkMode ? Color(0xFF2A2A3C) : Colors.blue),
+          Icon(icon, color: Color.fromARGB(255, 37, 100, 235)),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               text,
-              style: TextStyle(
-                  color: isDarkMode ? Color(0xFF2A2A3C) : Colors.blue),
+              style: const TextStyle(color: Color.fromARGB(255, 37, 100, 235)),
             ),
           ),
         ],

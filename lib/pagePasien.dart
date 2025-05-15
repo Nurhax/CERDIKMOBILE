@@ -11,17 +11,10 @@ import 'package:tubes/models/jadwal.dart';
 import 'package:tubes/models/manage_jadwal.dart';
 import 'package:tubes/models/pasien.dart';
 import 'package:tubes/opened_profile.dart';
-import 'package:provider/provider.dart';
-import 'theme_provider.dart'; // Import file yang dibuat
 import 'package:tubes/chatPage.dart';
 
 void main() {
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => ThemeProvider(),
-      child: const MyApp(),
-    ),
-  );
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -31,16 +24,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, child) {
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          theme: themeProvider.currentTheme,
-          home: pagePasien(
-            pasienSaatIni: Pasien(),
-          ),
-        );
-      },
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: pagePasien(
+        pasienSaatIni: Pasien(),
+      ),
     );
   }
 }
@@ -76,11 +64,8 @@ class _pagePasienState extends State<pagePasien> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
-    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor, // Warna latar belakang
+      backgroundColor: Colors.white,
       body: SafeArea(
           child: PageView(
         controller: _pageController,
@@ -97,13 +82,9 @@ class _pagePasienState extends State<pagePasien> {
       )),
       bottomNavigationBar: CurvedNavigationBar(
           index: _selectedIndex,
-          backgroundColor: isDarkMode
-              ? const Color.fromARGB(255, 182, 181, 181)!
-              : Colors.white,
-          color: isDarkMode
-              ? Color(0xFF2A2A3C)
-              : const Color.fromARGB(255, 37, 105, 255),
+          backgroundColor: Colors.white,
           animationDuration: const Duration(milliseconds: 350),
+          color: const Color.fromARGB(255, 37, 105, 255),
           onTap: _onItemTapped,
           items: const [
             Icon(
@@ -260,8 +241,6 @@ class _BerandaPasienState extends State<BerandaPasien> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
     // final List<Map<String, dynamic>> reminders = [
     //   {
     //     'icon': Icons.medical_services,
@@ -305,9 +284,7 @@ class _BerandaPasienState extends State<BerandaPasien> {
                   padding:
                       const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                   decoration: BoxDecoration(
-                    color: isDarkMode
-                        ? Color(0xFF2A2A3C)
-                        : const Color.fromARGB(255, 37, 105, 255),
+                    color: const Color.fromARGB(255, 37, 105, 255),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
@@ -335,11 +312,9 @@ class _BerandaPasienState extends State<BerandaPasien> {
                               )),
                     );
                   },
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.notifications,
-                    color: isDarkMode
-                        ? Color(0xFF2A2A3C)
-                        : const Color.fromARGB(255, 37, 105, 255),
+                    color: Color.fromARGB(255, 37, 105, 255),
                     size: 30.0,
                   ),
                 ),
@@ -351,10 +326,7 @@ class _BerandaPasienState extends State<BerandaPasien> {
             padding: EdgeInsets.only(left: 25.0, top: 20.0),
             child: Text(
               'Pengingat Saat Ini',
-              style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(height: 8),
@@ -408,10 +380,7 @@ class _BerandaPasienState extends State<BerandaPasien> {
             padding: EdgeInsets.only(left: 25.0, top: 20.0),
             child: Text(
               'Yang Akan Datang',
-              style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(height: 8),
@@ -517,8 +486,6 @@ class _jadwalPasienPageState extends State<jadwalPasienPage> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
     return SafeArea(
       child: Column(
         children: [
@@ -532,9 +499,7 @@ class _jadwalPasienPageState extends State<jadwalPasienPage> {
                   padding:
                       const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                   decoration: BoxDecoration(
-                    color: isDarkMode
-                        ? Color(0xFF2A2A3C)
-                        : const Color.fromARGB(255, 37, 105, 255),
+                    color: const Color.fromARGB(255, 37, 105, 255),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
@@ -563,11 +528,9 @@ class _jadwalPasienPageState extends State<jadwalPasienPage> {
                                 )),
                       );
                     },
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.notifications,
-                      color: isDarkMode
-                          ? Color(0xFF2A2A3C)
-                          : const Color.fromARGB(255, 37, 105, 255),
+                      color: Color.fromARGB(255, 37, 105, 255),
                       size: 30.0,
                     ),
                   )),
@@ -577,16 +540,11 @@ class _jadwalPasienPageState extends State<jadwalPasienPage> {
             padding: const EdgeInsets.only(left: 10.0, right: 10.0),
             child: Container(
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: isDarkMode
-                      ? [
-                          const Color(0xFF1E1E1E), // Warna gelap atas
-                          const Color(0xFF2A2A2A), // Warna gelap bawah
-                        ]
-                      : [
-                          Color.fromARGB(255, 96, 165, 250),
-                          Color.fromARGB(255, 37, 100, 235),
-                        ],
+                gradient: const LinearGradient(
+                  colors: [
+                    Color.fromARGB(255, 96, 165, 250),
+                    Color.fromARGB(255, 37, 100, 235),
+                  ],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
@@ -600,25 +558,15 @@ class _jadwalPasienPageState extends State<jadwalPasienPage> {
                 ),
                 availableGestures: AvailableGestures.all,
                 daysOfWeekStyle: const DaysOfWeekStyle(
-                  weekdayStyle: TextStyle(
-                    color: Colors.white,
-                  ),
-                  weekendStyle: TextStyle(
-                    color: Colors.white,
-                  ),
+                  weekdayStyle: TextStyle(color: Colors.white),
+                  weekendStyle: TextStyle(color: Colors.white),
                 ),
-                calendarStyle: CalendarStyle(
+                calendarStyle: const CalendarStyle(
                   todayDecoration: BoxDecoration(
-                    gradient: LinearGradient(
-                        colors: isDarkMode
-                            ? [
-                                const Color(0xFF2A2A3C), // Warna gelap atas
-                                const Color(0xFF2A2A3C), // Warna gelap bawah
-                              ]
-                            : [
-                                Color.fromARGB(255, 125, 166, 255),
-                                Color.fromARGB(255, 125, 166, 255),
-                              ]),
+                    gradient: LinearGradient(colors: [
+                      Color.fromARGB(255, 125, 166, 255),
+                      Color.fromARGB(255, 125, 166, 255),
+                    ]),
                     shape: BoxShape.circle,
                   ),
                   selectedDecoration: BoxDecoration(
@@ -647,8 +595,7 @@ class _jadwalPasienPageState extends State<jadwalPasienPage> {
                 padding: EdgeInsets.only(left: 20.0, top: 10.0),
                 child: Text(
                   "Obat Hari Ini : ",
-                  style: TextStyle(
-                      fontWeight: FontWeight.w500, color: Colors.black),
+                  style: TextStyle(fontWeight: FontWeight.w500),
                 ),
               ),
             ),
@@ -680,318 +627,243 @@ class _jadwalPasienPageState extends State<jadwalPasienPage> {
 
 class profilePasien extends StatelessWidget {
   final Pasien pasienSaatIni;
-  profilePasien({super.key, required this.pasienSaatIni});
-
-  // Tambahkan GlobalKey untuk setiap tombol
-  // final GlobalKey keyProfile = GlobalKey();
-  // final GlobalKey keyPersonalisasi = GlobalKey();
-  // final GlobalKey keyPemandu = GlobalKey();
-  // final GlobalKey keyBantuan = GlobalKey();
+  const profilePasien({super.key, required this.pasienSaatIni});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
-    return Scaffold(
-        backgroundColor: theme.scaffoldBackgroundColor,
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: isDarkMode
-                      ? [
-                          const Color(0xFF2A2A3C), // Warna gelap atas
-                          Color(0xFF2A2A3C), // Warna gelap bawah
-                        ]
-                      : [
-                          const Color(0xFF2564EB), // Warna terang atas
-                          const Color(0xFF60A5FA), // Warna terang bawah
-                        ],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-              ),
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 40.0),
-              child: Padding(
-                padding: EdgeInsets.only(left: 25.0),
-                child: Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color.fromARGB(255, 37, 100, 235),
+                Color.fromARGB(255, 96, 165, 250)
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 40.0),
+          child: Padding(
+            padding: EdgeInsets.only(left: 25.0),
+            child: Row(
+              children: [
+                Column(
                   children: [
-                    Column(
-                      children: [
-                        CircleAvatar(
-                          radius: 35,
-                          backgroundColor: Colors.white,
-                          child: Icon(
-                            Icons.account_circle,
-                            color: isDarkMode
-                                ? Color(0xFF2A2A3C)
-                                : const Color.fromARGB(255, 37, 105, 255),
-                            size: 60,
-                          ),
-                        ),
-                      ],
+                    CircleAvatar(
+                      radius: 35,
+                      backgroundColor: Colors.white,
+                      child: Icon(
+                        Icons.account_circle,
+                        color: Color.fromARGB(255, 70, 122, 238),
+                        size: 60,
+                      ),
                     ),
-                    SizedBox(height: 10),
-                    Padding(
-                      padding: EdgeInsets.only(left: 20.0),
-                      child: Column(
-                        children: [
-                          Text(
-                            '${pasienSaatIni.username}',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                  ],
+                ),
+                SizedBox(height: 10),
+                Padding(
+                  padding: EdgeInsets.only(left: 20.0),
+                  child: Column(
+                    children: [
+                      Text(
+                        '${pasienSaatIni.username}',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 20),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Profile
+            Padding(
+              padding: const EdgeInsets.only(
+                  top: 5.0, left: 15.0, right: 15.0, bottom: 10.0),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 37, 99, 235),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            ProfileScreen.pasien(pasienSaatini: pasienSaatIni)),
+                  );
+                },
+                child: const Row(
+                  children: [
+                    SizedBox(
+                      width: 20,
+                      height: 40,
+                    ),
+                    Icon(
+                      Icons.account_circle,
+                      color: Colors.white,
+                    ),
+                    SizedBox(width: 20),
+                    Expanded(
+                      child: Text(
+                        "Profile",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 20),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Profile
-                Padding(
-                  padding: const EdgeInsets.only(
-                      top: 5.0, left: 15.0, right: 15.0, bottom: 10.0),
-                  child: ElevatedButton(
-                    // key: keyProfile,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isDarkMode
-                          ? Color(0xFF2A2A3C)
-                          : const Color.fromARGB(255, 37, 105, 255),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ProfileScreen.pasien(
-                                someCondition: true,
-                                pasienSaatini: pasienSaatIni)),
-                      );
-                    },
-                    child: const Row(
-                      children: [
-                        SizedBox(
-                          width: 20,
-                          height: 40,
-                        ),
-                        Icon(
-                          Icons.account_circle,
-                          color: Colors.white,
-                        ),
-                        SizedBox(width: 20),
-                        Expanded(
-                          child: Text(
-                            "Profile",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+            // Personalisasi
+            Padding(
+              padding: const EdgeInsets.only(
+                  top: 5.0, left: 15.0, right: 15.0, bottom: 10.0),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 37, 99, 235),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
                   ),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
                 ),
-                // Personalisasi
-                Padding(
-                  padding: const EdgeInsets.only(
-                      top: 5.0, left: 15.0, right: 15.0, bottom: 10.0),
-                  child: ElevatedButton(
-                    // key: keyPersonalisasi,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isDarkMode
-                          ? Color(0xFF2A2A3C)
-                          : const Color.fromARGB(255, 37, 105, 255),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 10),
+                onPressed: () {
+                  // Aksi untuk tombol Personalisasi
+                  print("Personalisasi button clicked");
+                },
+                child: const Row(
+                  children: [
+                    SizedBox(
+                      width: 20,
+                      height: 40,
                     ),
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return Consumer<ThemeProvider>(
-                            builder: (context, themeProvider, child) {
-                              return AlertDialog(
-                                title: const Text("Mode Tampilan"),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    RadioListTile<bool>(
-                                      value: false, // Light Mode
-                                      groupValue: themeProvider.isDarkMode,
-                                      onChanged: (bool? value) {
-                                        if (value != null) {
-                                          themeProvider.toggleTheme(value);
-                                          Navigator.pop(context);
-                                        }
-                                      },
-                                      title: const Text("LIGHT MODE"),
-                                      secondary: const Icon(Icons.wb_sunny,
-                                          color: Colors.amber),
-                                    ),
-                                    RadioListTile<bool>(
-                                      value: true, // Dark Mode
-                                      groupValue: themeProvider.isDarkMode,
-                                      onChanged: (bool? value) {
-                                        if (value != null) {
-                                          themeProvider.toggleTheme(value);
-                                          Navigator.pop(context);
-                                        }
-                                      },
-                                      title: const Text("DARK MODE"),
-                                      secondary: const Icon(
-                                          Icons.nightlight_round,
-                                          color: Colors.blue),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      );
-                    },
-                    child: const Row(
-                      children: [
-                        SizedBox(
-                          width: 20,
-                          height: 40,
-                        ),
-                        Icon(
-                          Icons.sunny,
+                    Icon(
+                      Icons.sunny,
+                      color: Colors.white,
+                    ),
+                    SizedBox(width: 20),
+                    Expanded(
+                      child: Text(
+                        "Personalisasi",
+                        style: TextStyle(
                           color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
                         ),
-                        SizedBox(width: 20),
-                        Expanded(
-                          child: Text(
-                            "Personalisasi",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                // Pemandu
-                Padding(
-                  padding: const EdgeInsets.only(
-                      top: 5.0, left: 15.0, right: 15.0, bottom: 10.0),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isDarkMode
-                          ? Color(0xFF2A2A3C)
-                          : const Color.fromARGB(255, 37, 105, 255),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
                       ),
-                      padding: const EdgeInsets.symmetric(vertical: 10),
                     ),
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder: (context) => PanduanPasien(
-                          someCondition: true,
-                        ),
-                      );
-                    },
-                    child: const Row(
-                      children: [
-                        SizedBox(
-                          width: 20,
-                          height: 40,
-                        ),
-                        Icon(
-                          Icons.chrome_reader_mode_outlined,
-                          color: Colors.white,
-                        ),
-                        SizedBox(width: 20),
-                        Expanded(
-                          child: Text(
-                            "Pemandu",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  ],
                 ),
-                // Pusat Bantuan
-                Padding(
-                  padding: const EdgeInsets.only(
-                      top: 5.0, left: 15.0, right: 15.0, bottom: 10.0),
-                  child: ElevatedButton(
-                    // key: keyBantuan,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isDarkMode
-                          ? Color(0xFF2A2A3C)
-                          : const Color.fromARGB(255, 37, 105, 255),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
+              ),
+            ),
+            // Pemandu
+            Padding(
+              padding: const EdgeInsets.only(
+                  top: 5.0, left: 15.0, right: 15.0, bottom: 10.0),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 37, 99, 235),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                ),
+                onPressed: () {
+                  // Aksi untuk tombol Pemandu
+                  PanduanPasien.showGuideDialog(context);
+                },
+                child: const Row(
+                  children: [
+                    SizedBox(
+                      width: 20,
+                      height: 40,
+                    ),
+                    Icon(
+                      Icons.chrome_reader_mode_outlined,
+                      color: Colors.white,
+                    ),
+                    SizedBox(width: 20),
+                    Expanded(
+                      child: Text(
+                        "Pemandu",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                      padding: const EdgeInsets.symmetric(vertical: 10),
                     ),
-                    onPressed: () {
-                      // Aksi untuk tombol Pusat Bantuan
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => ChatPage()),
-                      );
-                    },
-                    child: const Row(
-                      children: [
-                        SizedBox(
-                          width: 20,
-                          height: 40,
-                        ),
-                        Icon(
-                          Icons.wifi_calling_3_outlined,
-                          color: Colors.white,
-                        ),
-                        SizedBox(width: 20),
-                        Expanded(
-                          child: Text(
-                            "Pusat Bantuan",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
+            ),
+            // Pusat Bantuan
+            Padding(
+              padding: const EdgeInsets.only(
+                  top: 5.0, left: 15.0, right: 15.0, bottom: 10.0),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 37, 99, 235),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                ),
+                onPressed: () {
+                  // Aksi untuk tombol Pusat Bantuan
+                    Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ChatPage()),
+                  );
+                },
+                child: const Row(
+                  children: [
+                    SizedBox(
+                      width: 20,
+                      height: 40,
+                    ),
+                    Icon(
+                      Icons.wifi_calling_3_outlined,
+                      color: Colors.white,
+                    ),
+                    SizedBox(width: 20),
+                    Expanded(
+                      child: Text(
+                        "Pusat Bantuan",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
-        ));
+        ),
+      ],
+    );
   }
 }
 

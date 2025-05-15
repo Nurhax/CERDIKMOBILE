@@ -1,16 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:tubes/registrasi_nakes.dart';
 import 'package:tubes/registrasi_pasien.dart';
-import 'package:provider/provider.dart';
-import 'theme_provider.dart'; // Import file yang dibuat
 
 void main() {
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => ThemeProvider(),
-      child: const MyApp(),
-    ),
-  );
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -18,38 +11,26 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, child) {
-        return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            theme: themeProvider.currentTheme,
-            home: Pilihrole(someCondition: true));
-      },
+    return MaterialApp(
+      home: Pilihrole(),
     );
   }
 }
 
 class Pilihrole extends StatelessWidget {
-  final bool someCondition;
-  const Pilihrole({super.key, required this.someCondition});
+  const Pilihrole({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
     return Scaffold(
       body: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              isDarkMode
-                  ? Color(0xFF2A2A3C)
-                  : Color.fromARGB(255, 37, 100, 235),
-              isDarkMode
-                  ? Color.fromARGB(255, 57, 51, 109)
-                  : Color.fromARGB(255, 96, 165, 250)
+              Color.fromARGB(255, 37, 100, 235),
+              Color.fromARGB(255, 96, 165, 250)
             ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -62,7 +43,7 @@ class Pilihrole extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              Column(
+              const Column(
                 children: [
                   Text(
                     'Halo! Aku Cerdik,\nKamu Siapa Ya?',
@@ -70,9 +51,7 @@ class Pilihrole extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 33.0,
                       fontWeight: FontWeight.bold,
-                      color: isDarkMode
-                          ? Color.fromARGB(255, 38, 202, 197)
-                          : Colors.white,
+                      color: Colors.white,
                     ),
                   ),
                 ],
@@ -103,13 +82,9 @@ class Pilihrole extends StatelessWidget {
                 children: [
                   ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          foregroundColor: isDarkMode
-                              ? Colors.white
-                              : const Color.fromARGB(
-                                  255, 37, 121, 247), // Warna teks
-                          backgroundColor: isDarkMode
-                              ? Color.fromARGB(255, 38, 202, 197)
-                              : Colors.white,
+                          foregroundColor: const Color.fromARGB(
+                              255, 37, 121, 247), // Warna teks
+                          backgroundColor: Colors.white,
                           fixedSize:
                               const Size(180, 30) // Warna background tombol
                           ),
@@ -117,8 +92,7 @@ class Pilihrole extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) =>
-                                  RegistrasiNakes(someCondition: true)),
+                              builder: (context) => RegistrasiNakes()),
                         );
                       },
                       child: const Text("Tenaga Kesehatan")),
@@ -140,13 +114,9 @@ class Pilihrole extends StatelessWidget {
                 children: [
                   ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          foregroundColor: isDarkMode
-                              ? Colors.white
-                              : const Color.fromARGB(
-                                  255, 37, 121, 247), // Warna teks
-                          backgroundColor: isDarkMode
-                              ? Color.fromARGB(255, 38, 202, 197)
-                              : Colors.white,
+                          foregroundColor: const Color.fromARGB(
+                              255, 37, 121, 247), // Warna teks
+                          backgroundColor: Colors.white,
                           fixedSize:
                               const Size(180, 30) // Warna background tombol
                           ),
@@ -154,8 +124,7 @@ class Pilihrole extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) =>
-                                  RegistrasiPasien(someCondition: true)),
+                              builder: (context) => RegistrasiPasien()),
                         );
                       },
                       child: const Text("Pasien")),

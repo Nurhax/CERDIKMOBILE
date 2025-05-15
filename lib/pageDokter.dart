@@ -14,18 +14,11 @@ import 'package:tubes/models/pasien.dart';
 import 'package:tubes/opened_profile.dart';
 import 'package:http/http.dart' as http;
 import 'jadwalView/HomeJadwal.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'theme_provider.dart'; // Import file yang dibuat
 import 'package:tubes/chatPage.dart';
 
+
 void main() {
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => ThemeProvider(),
-      child: const MyApp(),
-    ),
-  );
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -35,14 +28,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, child) {
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          theme: themeProvider.currentTheme,
-          home: pageDokter(nakesSaatIni: Nakes()),
-        );
-      },
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: pageDokter(nakesSaatIni: Nakes()),
     );
   }
 }
@@ -69,18 +57,6 @@ class _pageDokterState extends State<pageDokter> {
   late int _selectedIndex = 0;
   PageController _pageController = PageController();
 
-  // final GlobalKey keyBottomNav = GlobalKey();
-  // final GlobalKey keyHomeTab = GlobalKey();
-  // final GlobalKey keySearchbar = GlobalKey();
-  // final GlobalKey keyPasienList = GlobalKey();
-
-  // // Tambahkan GlobalKey untuk setiap tombol
-  // final GlobalKey keyProfile = GlobalKey();
-  // final GlobalKey keyPersonalisasi = GlobalKey();
-  // final GlobalKey keyPemandu = GlobalKey();
-  // final GlobalKey keyBantuan = GlobalKey();
-  // final GlobalKey keyTambahJadwal = GlobalKey();
-
   @override
   void initState() {
     super.initState();
@@ -97,14 +73,10 @@ class _pageDokterState extends State<pageDokter> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
-    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor, // Warna latar belakang
+      backgroundColor: Colors.white,
       body: SafeArea(
           child: PageView(
-        // key: keyHomeTab,
         controller: _pageController,
         onPageChanged: (index) {
           setState(() {
@@ -112,40 +84,17 @@ class _pageDokterState extends State<pageDokter> {
           });
         },
         children: [
-          dataPasienPage(
-            nakesSaatIni: widget.nakesSaatIni,
-            // keySearchbar: keySearchbar,
-            // keyPasienList: keyPasienList,
-          ),
-          tambahPasienPage(
-            nakesSaatIni: widget.nakesSaatIni,
-            // keyTambahJadwal: keyTambahJadwal
-          ),
+          dataPasienPage(nakesSaatIni: widget.nakesSaatIni),
+          tambahPasienPage(nakesSaatIni: widget.nakesSaatIni),
           tambahObatPage(nakesSaatIni: widget.nakesSaatIni),
-          morePage(
-            nakesSaatIni: widget.nakesSaatIni,
-            // keyBottomNav: keyBottomNav,
-            // keyHomeTab: keyHomeTab,
-            // keySearchbar: keySearchbar,
-            // keyPasienList: keyPasienList,
-            // keyProfile: keyProfile,
-            // keyPersonalisasi: keyPersonalisasi,
-            // keyPemandu: keyPemandu,
-            // keyBantuan: keyBantuan,
-            // keyTambahJadwal: keyTambahJadwal
-          ),
+          morePage(nakesSaatIni: widget.nakesSaatIni),
         ],
       )),
       bottomNavigationBar: CurvedNavigationBar(
-          // key: keyBottomNav,
           index: _selectedIndex,
-          backgroundColor: isDarkMode
-              ? const Color.fromARGB(255, 182, 181, 181)!
-              : Colors.white,
-          color: isDarkMode
-              ? Color(0xFF2A2A3C)
-              : const Color.fromARGB(255, 37, 105, 255),
+          backgroundColor: Colors.white,
           animationDuration: const Duration(milliseconds: 350),
+          color: const Color.fromARGB(255, 37, 105, 255),
           onTap: _onItemTapped,
           items: const [
             Icon(
@@ -171,14 +120,7 @@ class _pageDokterState extends State<pageDokter> {
 
 class dataPasienPage extends StatefulWidget {
   final Nakes nakesSaatIni;
-  // final GlobalKey keySearchbar;
-  // final GlobalKey keyPasienList;
-  dataPasienPage({
-    super.key,
-    required this.nakesSaatIni,
-    // required this.keySearchbar,
-    // required this.keyPasienList
-  });
+  dataPasienPage({super.key, required this.nakesSaatIni});
 
   @override
   State<dataPasienPage> createState() => _dataPasienPageState();
@@ -251,223 +193,252 @@ class _dataPasienPageState extends State<dataPasienPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 20.0, top: 30.0),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(255, 37, 105, 255),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.account_circle, color: Colors.white),
+                    SizedBox(width: 8),
+                    Text(
+                      'Hi, ${widget.nakesSaatIni.username}',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        // Search Bar
+        const SizedBox(height: 16),
+        Padding(
+          padding: const EdgeInsets.only(left: 20.0, right: 20.0),
+          child: TextField(
+            controller: searchController,
+            decoration: InputDecoration(
+              hintText: "Search Id Pasien",
+              hintStyle:
+                  const TextStyle(color: Color.fromARGB(255, 37, 99, 235)),
+              prefixIcon: const Icon(
+                Icons.search,
+                color: Color.fromARGB(255, 37, 99, 235),
+              ),
+              filled: true,
+              fillColor: Colors.blue.shade100,
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(30),
+                borderSide:
+                    const BorderSide(color: Color.fromARGB(255, 37, 99, 235)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(30),
+                borderSide:
+                    const BorderSide(color: Color.fromARGB(255, 37, 99, 235)),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 20),
+        const Padding(
+          padding: EdgeInsets.only(left: 35.0),
+          child: Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 20.0, top: 30.0),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: isDarkMode
-                        ? Color(0xFF2A2A3C)
-                        : const Color.fromARGB(255, 37, 105, 255),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.account_circle, color: Colors.white),
-                      SizedBox(width: 8),
-                      Text(
-                        'Hi, ${widget.nakesSaatIni.username}',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ],
-                  ),
+              Text(
+                "Jadwal Pasien Anda",
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],
           ),
-          // Search Bar
-          const SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.only(left: 20.0, right: 20.0),
-            child: TextField(
-              // key: widget.keySearchbar,
-              controller: searchController,
-              decoration: InputDecoration(
-                hintText: "Search Id Pasien",
-                hintStyle: TextStyle(
-                  color: isDarkMode
-                      ? Color(0xFF2A2A3C)
-                      : const Color.fromARGB(255, 37, 105, 255),
-                ),
-                prefixIcon: Icon(
-                  Icons.search,
-                  color: isDarkMode
-                      ? Color(0xFF2A2A3C)
-                      : const Color.fromARGB(255, 37, 105, 255),
-                ),
-                filled: true,
-                fillColor: isDarkMode
-                    ? Color.fromARGB(255, 223, 222, 222)
-                    : Colors.blue.shade100,
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide(
-                    color: isDarkMode
-                        ? Color(0xFF2A2A3C)
-                        : const Color.fromARGB(255, 37, 105, 255),
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide(
-                    color: isDarkMode
-                        ? Color(0xFF2A2A3C)
-                        : const Color.fromARGB(255, 37, 105, 255),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          const Padding(
-            padding: EdgeInsets.only(left: 35.0),
-            child: Column(
-              children: [
-                Text(
-                  "Jadwal Pasien Anda",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 10),
-          // List of Patients
-          Expanded(
-            child: pasienHasilSearch.isNotEmpty
-                ? ListView.builder(
-                    // key: widget.keyPasienList,
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    itemCount: pasienHasilSearch.length,
-                    itemBuilder: (context, index) {
-                      final pasien = pasienHasilSearch[index];
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => detailPageDokter(
-                                pasienSaatIni: pasien,
-                              ),
+        ),
+        const SizedBox(height: 10),
+        // List of Patients
+        Expanded(
+          child: pasienHasilSearch.isNotEmpty
+              ? ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  itemCount: pasienHasilSearch.length,
+                  itemBuilder: (context, index) {
+                    final pasien = pasienHasilSearch[index];
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => detailPageDokter(
+                              pasienSaatIni: pasien,
                             ),
-                          );
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(vertical: 8),
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: isDarkMode
-                                ? Color(0xFF2A2A3C)
-                                : const Color.fromARGB(255, 37, 105, 255),
-                            borderRadius: BorderRadius.circular(20),
                           ),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.account_circle,
-                                  color: Colors.white, size: 40),
-                              const SizedBox(width: 16),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    pasien.nama ?? "NULL",
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                        );
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: const Color.fromARGB(255, 37, 105, 255),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.account_circle,
+                                color: Colors.white, size: 40),
+                            const SizedBox(width: 16),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  pasien.nama ?? "NULL",
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
                                   ),
-                                  Text(
-                                    "${pasien.usia ?? "N/A"} - ${pasien.gender ?? "N/A"}",
-                                    style: const TextStyle(
-                                      color: Colors.white70,
-                                      fontSize: 14,
-                                    ),
+                                ),
+                                Text(
+                                  "${pasien.usia ?? "N/A"} - ${pasien.gender ?? "N/A"}",
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 14,
                                   ),
-                                ],
-                              ),
-                            ],
-                          ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
-                      );
-                    },
-                  )
-                : Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          'img/mascot.png',
-                          height: 100,
-                          width: 100,
-                        ),
-                        const SizedBox(height: 16),
-                        const Text(
-                          "Kamu belum punya pasien saat ini",
-                          style: TextStyle(fontSize: 14, color: Colors.black),
-                        ),
-                      ],
-                    ),
+                      ),
+                    );
+                  },
+                )
+              : Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'img/mascot.png',
+                        height: 100,
+                        width: 100,
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        "Kamu belum punya pasien saat ini",
+                        style: TextStyle(fontSize: 14, color: Colors.black),
+                      ),
+                    ],
                   ),
-          ),
-        ],
-      ),
+                ),
+        ),
+      ],
     );
   }
 }
 
 class tambahPasienPage extends StatelessWidget {
   final Nakes nakesSaatIni;
-  // final GlobalKey keyTambahJadwal;
-  const tambahPasienPage({
-    Key? key,
-    required this.nakesSaatIni,
-    /*required this.keyTambahJadwal*/
-  }) : super(key: key);
+
+  const tambahPasienPage({Key? key, required this.nakesSaatIni})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 20.0, top: 30.0),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(255, 37, 105, 255),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.account_circle, color: Colors.white),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Hi, ${nakesSaatIni.username}',
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 100),
+        Center(
+          child: Column(
             children: [
+              Image.asset(
+                'img/medicineTambahObat.png',
+                width: 100,
+                height: 100,
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Tambah Jadwal\n Minum Obat Pasien',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
               Padding(
-                padding: const EdgeInsets.only(left: 20.0, top: 30.0),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: isDarkMode
-                        ? Color(0xFF2A2A3C)
-                        : const Color.fromARGB(255, 37, 105, 255),
-                    borderRadius: BorderRadius.circular(20),
+                padding: const EdgeInsets.symmetric(horizontal: 100.0),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        const Color.fromARGB(255, 173, 202, 255), // Light blue
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            TambahPasien(nakesSaatIni: nakesSaatIni),
+                      ),
+                    );
+                  },
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Icon(Icons.account_circle, color: Colors.white),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Hi, ${nakesSaatIni.username}',
-                        style: const TextStyle(color: Colors.white),
+                      const Text(
+                        'Tambah',
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 37, 105, 255),
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: const Color.fromARGB(255, 37, 105, 255),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Icon(
+                          Icons.add,
+                          color: Colors.white,
+                          size: 20,
+                        ),
                       ),
                     ],
                   ),
@@ -475,81 +446,8 @@ class tambahPasienPage extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 100),
-          Center(
-            child: Column(
-              children: [
-                Image.asset(
-                  'img/medicineTambahObat.png',
-                  width: 100,
-                  height: 100,
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  'Tambah Jadwal\n Minum Obat Pasien',
-                  style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 20),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 100.0),
-                  child: ElevatedButton(
-                    // key: keyTambahJadwal,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isDarkMode
-                          ? Color(0xFF2A2A3C)
-                          : Color.fromARGB(255, 173, 202, 255), // Light blue
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              TambahPasien(nakesSaatIni: nakesSaatIni),
-                        ),
-                      );
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Tambah',
-                          style: TextStyle(
-                            color: isDarkMode
-                                ? Colors.white
-                                : const Color.fromARGB(255, 37, 105, 255),
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: isDarkMode
-                                ? Color(0xFF2A2A3C)
-                                : Color.fromARGB(255, 173, 202, 255),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: const Icon(
-                            Icons.add,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          )
-        ],
-      ),
+        )
+      ],
     );
   }
 }
@@ -625,12 +523,10 @@ class _tambahObatPageState extends State<tambahObatPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
     return isLoading
         ? const Center(child: CircularProgressIndicator())
         : Scaffold(
-            backgroundColor: theme.scaffoldBackgroundColor,
+            backgroundColor: Colors.white,
             body: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -643,9 +539,7 @@ class _tambahObatPageState extends State<tambahObatPage> {
                         padding: const EdgeInsets.symmetric(
                             vertical: 8, horizontal: 16),
                         decoration: BoxDecoration(
-                          color: isDarkMode
-                              ? Color(0xFF2A2A3C)
-                              : const Color.fromARGB(255, 37, 105, 255),
+                          color: const Color.fromARGB(255, 37, 105, 255),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: const Row(
@@ -669,36 +563,23 @@ class _tambahObatPageState extends State<tambahObatPage> {
                     controller: searchIdPasienTextController,
                     decoration: InputDecoration(
                       hintText: "Search",
-                      hintStyle: TextStyle(
-                        color: isDarkMode
-                            ? Color(0xFF2A2A3C)
-                            : const Color.fromARGB(255, 37, 105, 255),
-                      ),
-                      prefixIcon: Icon(
+                      hintStyle: const TextStyle(
+                          color: Color.fromARGB(255, 37, 99, 235)),
+                      prefixIcon: const Icon(
                         Icons.search,
-                        color: isDarkMode
-                            ? Color(0xFF2A2A3C)
-                            : const Color.fromARGB(255, 37, 105, 255),
+                        color: Color.fromARGB(255, 37, 99, 235),
                       ),
                       filled: true,
-                      fillColor: isDarkMode
-                          ? Color.fromARGB(255, 223, 222, 222)
-                          : Colors.blue.shade100,
+                      fillColor: Colors.blue.shade100,
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30),
-                        borderSide: BorderSide(
-                          color: isDarkMode
-                              ? Color(0xFF2A2A3C)
-                              : const Color.fromARGB(255, 37, 105, 255),
-                        ),
+                        borderSide: const BorderSide(
+                            color: Color.fromARGB(255, 37, 99, 235)),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30),
-                        borderSide: BorderSide(
-                          color: isDarkMode
-                              ? Color(0xFF2A2A3C)
-                              : const Color.fromARGB(255, 37, 105, 255),
-                        ),
+                        borderSide: const BorderSide(
+                            color: Color.fromARGB(255, 37, 99, 235)),
                       ),
                     ),
                   ),
@@ -708,8 +589,7 @@ class _tambahObatPageState extends State<tambahObatPage> {
                   padding: EdgeInsets.only(left: 35.0),
                   child: Text(
                     "Obat Yang Tersedia",
-                    style: TextStyle(
-                        fontWeight: FontWeight.w500, color: Colors.black),
+                    style: TextStyle(fontWeight: FontWeight.w500),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -734,9 +614,7 @@ class _tambahObatPageState extends State<tambahObatPage> {
                           child: Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: isDarkMode
-                                  ? Color(0xFF2A2A3C)
-                                  : const Color.fromARGB(255, 37, 105, 255),
+                              color: const Color.fromARGB(255, 37, 105, 255),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Row(
@@ -783,13 +661,12 @@ class _tambahObatPageState extends State<tambahObatPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => AddMedicineScreen(
-                              someCondition: true, nakesSaatIni: nakesSaatIni)),
+                        builder: (context) =>
+                            AddMedicineScreen(nakesSaatIni: nakesSaatIni),
+                      ),
                     );
                   },
-                  backgroundColor: isDarkMode
-                      ? Color(0xFF2A2A3C)
-                      : const Color.fromARGB(255, 37, 105, 255),
+                  backgroundColor: const Color.fromARGB(255, 37, 105, 255),
                   shape: const CircleBorder(),
                   child: const Icon(Icons.add, color: Colors.white),
                 ),
@@ -799,380 +676,244 @@ class _tambahObatPageState extends State<tambahObatPage> {
   }
 }
 
-class morePage extends StatefulWidget {
+class morePage extends StatelessWidget {
   final Nakes nakesSaatIni;
-  // final GlobalKey keyBottomNav;
-  // final GlobalKey keyHomeTab;
-  // final GlobalKey keySearchbar;
-  // final GlobalKey keyPasienList;
-  // final GlobalKey keyProfile;
-  // final GlobalKey keyPersonalisasi;
-  // final GlobalKey keyPemandu;
-  // final GlobalKey keyBantuan;
-  // final GlobalKey keyTambahJadwal;
+  const morePage({super.key, required this.nakesSaatIni});
 
-  morePage({
-    super.key,
-    required this.nakesSaatIni,
-    // required this.keyBottomNav,
-    // required this.keyHomeTab,
-    // required this.keySearchbar,
-    // required this.keyPasienList,
-    // required this.keyProfile,
-    // required this.keyPersonalisasi,
-    // required this.keyPemandu,
-    // required this.keyBantuan,
-    // required this.keyTambahJadwal
-  });
-
-  @override
-  State<morePage> createState() => _morePageState();
-}
-
-class _morePageState extends State<morePage> {
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: isDarkMode
-                    ? [
-                        Color(0xFF2A2A3C), // Warna gelap atas
-                        Color(0xFF2A2A3C) // Warna gelap bawah
-                      ]
-                    : [
-                        const Color(0xFF2564EB), // Warna terang atas
-                        const Color(0xFF60A5FA), // Warna terang bawah
-                      ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 40.0),
-            child: Padding(
-              padding: EdgeInsets.only(left: 25.0),
-              child: Row(
-                children: [
-                  Column(
-                    children: [
-                      CircleAvatar(
-                        radius: 35,
-                        backgroundColor: Colors.white,
-                        child: Icon(
-                          Icons.account_circle,
-                          color: isDarkMode
-                              ? Color(0xFF2A2A3C)
-                              : const Color.fromARGB(255, 37, 105, 255),
-                          size: 60,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 10),
-                  Padding(
-                    padding: EdgeInsets.only(left: 20.0),
-                    child: Column(
-                      children: [
-                        Text(
-                          '${widget.nakesSaatIni.username}',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color.fromARGB(255, 37, 100, 235),
+                Color.fromARGB(255, 96, 165, 250)
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
             ),
           ),
-          const SizedBox(height: 20),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Profile
-              Padding(
-                padding: const EdgeInsets.only(
-                    top: 5.0, left: 15.0, right: 15.0, bottom: 10.0),
-                child: ElevatedButton(
-                  // key: widget.keyProfile,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isDarkMode
-                        ? Color(0xFF2A2A3C)
-                        : const Color.fromARGB(255, 37, 105, 255),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ProfileScreen.nakes(
-                              someCondition: true,
-                              nakesSaatini: widget.nakesSaatIni)),
-                    );
-                  },
-                  child: const Row(
-                    children: [
-                      SizedBox(
-                        width: 20,
-                        height: 40,
-                      ),
-                      Icon(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 40.0),
+          child: Padding(
+            padding: EdgeInsets.only(left: 25.0),
+            child: Row(
+              children: [
+                Column(
+                  children: [
+                    CircleAvatar(
+                      radius: 35,
+                      backgroundColor: Colors.white,
+                      child: Icon(
                         Icons.account_circle,
-                        color: Colors.white,
+                        color: Color.fromARGB(255, 70, 122, 238),
+                        size: 60,
                       ),
-                      SizedBox(width: 20),
-                      Expanded(
-                        child: Text(
-                          "Profile",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              // Personalisasi
-              Padding(
-                padding: const EdgeInsets.only(
-                    top: 5.0, left: 15.0, right: 15.0, bottom: 10.0),
-                child: ElevatedButton(
-                  // key: widget.keyPersonalisasi,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isDarkMode
-                        ? Color(0xFF2A2A3C)
-                        : const Color.fromARGB(255, 37, 105, 255),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
                     ),
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                  ),
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return Consumer<ThemeProvider>(
-                          builder: (context, themeProvider, child) {
-                            return AlertDialog(
-                              title: const Text("Mode Tampilan"),
-                              content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  RadioListTile<bool>(
-                                    value: false, // Light Mode
-                                    groupValue: themeProvider.isDarkMode,
-                                    onChanged: (bool? value) {
-                                      if (value != null) {
-                                        themeProvider.toggleTheme(value);
-                                        Navigator.pop(context);
-                                      }
-                                    },
-                                    title: const Text("LIGHT MODE"),
-                                    secondary: const Icon(Icons.wb_sunny,
-                                        color: Colors.amber),
-                                  ),
-                                  RadioListTile<bool>(
-                                    value: true, // Dark Mode
-                                    groupValue: themeProvider.isDarkMode,
-                                    onChanged: (bool? value) {
-                                      if (value != null) {
-                                        themeProvider.toggleTheme(value);
-                                        Navigator.pop(context);
-                                      }
-                                    },
-                                    title: const Text("DARK MODE"),
-                                    secondary: const Icon(
-                                        Icons.nightlight_round,
-                                        color: Colors.blue),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        );
-                      },
-                    );
-                  },
-                  // showDialog(
-                  //   context: context,
-                  //   builder: (BuildContext context) {
-                  //     return Consumer<ThemeProvider>(
-                  //       builder: (context, themeProvider, child) {
-                  //         return AlertDialog(
-                  //           title: const Text("Mode Tampilan"),
-                  //           content: Column(
-                  //             mainAxisSize: MainAxisSize.min,
-                  //             children: [
-                  //               RadioListTile(
-                  //                 value: false,
-                  //                 groupValue: themeProvider.isDarkMode,
-                  //                 onChanged: (bool? value) {
-                  //                   themeProvider.toggleTheme(false);
-                  //                   Navigator.pop(
-                  //                       context); // Tutup dialog setelah perubahan
-                  //                 },
-                  //                 title: const Text("LIGHT MODE"),
-                  //                 secondary: const Icon(Icons.wb_sunny),
-                  //               ),
-                  //               RadioListTile(
-                  //                 value: true,
-                  //                 groupValue: themeProvider.isDarkMode,
-                  //                 onChanged: (bool? value) {
-                  //                   themeProvider.toggleTheme(true);
-                  //                   Navigator.pop(context);
-                  //                 },
-                  //                 title: const Text("DARK MODE"),
-                  //                 secondary: const Icon(Icons.nightlight_round),
-                  //               ),
-                  //             ],
-                  //           ),
-                  //         );
-                  //       },
-                  //     );
-                  //   },
-                  // );
-
-                  child: const Row(
+                  ],
+                ),
+                SizedBox(height: 10),
+                Padding(
+                  padding: EdgeInsets.only(left: 20.0),
+                  child: Column(
                     children: [
-                      SizedBox(
-                        width: 20,
-                        height: 40,
-                      ),
-                      Icon(
-                        Icons.sunny,
-                        color: Colors.white,
-                      ),
-                      SizedBox(width: 20),
-                      Expanded(
-                        child: Text(
-                          "Personalisasi",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
+                      Text(
+                        '${nakesSaatIni.username}',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
                   ),
                 ),
-              ),
-              // Pemandu
-              Padding(
-                padding: const EdgeInsets.only(
-                    top: 5.0, left: 15.0, right: 15.0, bottom: 10.0),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isDarkMode
-                        ? Color(0xFF2A2A3C)
-                        : const Color.fromARGB(255, 37, 105, 255),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                  ),
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      builder: (context) => PanduanDokter(
-                        someCondition: true,
-                      ),
-                    );
-                  },
-                  child: const Row(
-                    children: [
-                      SizedBox(
-                        width: 20,
-                        height: 40,
-                      ),
-                      Icon(
-                        Icons.chrome_reader_mode_outlined,
-                        color: Colors.white,
-                      ),
-                      SizedBox(width: 20),
-                      Expanded(
-                        child: Text(
-                          "Pemandu",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              // Pusat Bantuan
-              Padding(
-                padding: const EdgeInsets.only(
-                    top: 5.0, left: 15.0, right: 15.0, bottom: 10.0),
-                child: ElevatedButton(
-                  // key: widget.keyBantuan,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isDarkMode
-                        ? Color(0xFF2A2A3C)
-                        : const Color.fromARGB(255, 37, 105, 255),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                  ),
-                  onPressed: () {
-                    // Aksi untuk tombol Pusat Bantuan
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => ChatPage()),
-                    );
-                  },
-                  child: const Row(
-                    children: [
-                      SizedBox(
-                        width: 20,
-                        height: 40,
-                      ),
-                      Icon(
-                        Icons.wifi_calling_3_outlined,
-                        color: Colors.white,
-                      ),
-                      SizedBox(width: 20),
-                      Expanded(
-                        child: Text(
-                          "Pusat Bantuan",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 20),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Profile
+            Padding(
+              padding: const EdgeInsets.only(
+                  top: 5.0, left: 15.0, right: 15.0, bottom: 10.0),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 37, 99, 235),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            ProfileScreen.nakes(nakesSaatini: nakesSaatIni)),
+                  );
+                },
+                child: const Row(
+                  children: [
+                    SizedBox(
+                      width: 20,
+                      height: 40,
+                    ),
+                    Icon(
+                      Icons.account_circle,
+                      color: Colors.white,
+                    ),
+                    SizedBox(width: 20),
+                    Expanded(
+                      child: Text(
+                        "Profile",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            // Personalisasi
+            Padding(
+              padding: const EdgeInsets.only(
+                  top: 5.0, left: 15.0, right: 15.0, bottom: 10.0),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 37, 99, 235),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                ),
+                onPressed: () {
+                  // Aksi untuk tombol Personalisasi
+                  print("Personalisasi button clicked");
+                },
+                child: const Row(
+                  children: [
+                    SizedBox(
+                      width: 20,
+                      height: 40,
+                    ),
+                    Icon(
+                      Icons.sunny,
+                      color: Colors.white,
+                    ),
+                    SizedBox(width: 20),
+                    Expanded(
+                      child: Text(
+                        "Personalisasi",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            // Pemandu
+            Padding(
+              padding: const EdgeInsets.only(
+                  top: 5.0, left: 15.0, right: 15.0, bottom: 10.0),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 37, 99, 235),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                ),
+                onPressed: () {
+                  // Aksi untuk tombol Pemandu
+                  PanduanDokter.showGuideDialog(context);
+                },
+                child: const Row(
+                  children: [
+                    SizedBox(
+                      width: 20,
+                      height: 40,
+                    ),
+                    Icon(
+                      Icons.chrome_reader_mode_outlined,
+                      color: Colors.white,
+                    ),
+                    SizedBox(width: 20),
+                    Expanded(
+                      child: Text(
+                        "Pemandu",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            // Pusat Bantuan
+            Padding(
+              padding: const EdgeInsets.only(
+                  top: 5.0, left: 15.0, right: 15.0, bottom: 10.0),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 37, 99, 235),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                ),
+                onPressed: () {
+                  // Aksi untuk tombol Pusat Bantuan
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ChatPage()),
+                  );
+                },
+                child: const Row(
+                  children: [
+                    SizedBox(
+                      width: 20,
+                      height: 40,
+                    ),
+                    Icon(
+                      Icons.wifi_calling_3_outlined,
+                      color: Colors.white,
+                    ),
+                    SizedBox(width: 20),
+                    Expanded(
+                      child: Text(
+                        "Pusat Bantuan",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

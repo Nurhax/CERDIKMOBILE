@@ -1,36 +1,19 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:tubes/loadingPageNakes.dart';
 import 'package:tubes/models/nakes.dart';
 import 'package:tubes/models/pasien.dart';
 import 'package:tubes/pilihRole.dart';
 import 'package:tubes/loadingPagePasien.dart';
 import 'package:http/http.dart' as http;
-import 'Security/hashing_service.dart';
-import 'package:provider/provider.dart';
-import 'theme_provider.dart'; // Import file yang dibuat
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-  ]);
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => ThemeProvider(),
-      child: const Login(someCondition: true),
-    ),
-  );
+  runApp(const Login());
 }
 
 class Login extends StatefulWidget {
-  final bool someCondition;
-  const Login({
-    super.key,
-    required this.someCondition,
-  });
+  const Login({super.key});
 
   @override
   _LoginState createState() => _LoginState();
@@ -40,115 +23,27 @@ class _LoginState extends State<Login> {
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-  void showErrorDialog(BuildContext context, String message) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Login Error"),
-          content: Text(message),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text("OK"),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
-    WidgetsFlutterBinding.ensureInitialized();
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
     return MaterialApp(
       home: Scaffold(
-        backgroundColor: isDarkMode ? Color(0xFF2A2A3C) : Color(0xFF2563EB),
+        backgroundColor: const Color(0xFF2563EB),
         body: Stack(
-          fit: StackFit.expand,
           children: [
-            // Logo and top content
-            Positioned(
-              top: 50,
-              left: 0,
-              right: 0,
-              child: Column(
-                children: <Widget>[
-                  Align(
-                    alignment: const Alignment(0.20, 0),
-                    child: Image.asset(
-                      'img/loadingtop.png',
-                      width: 50,
-                      height: 50,
-                    ),
-                  ),
-                  const SizedBox(height: 1),
-                  Text(
-                    'CERDIK',
-                    style: TextStyle(
-                      color: isDarkMode
-                          ? Color.fromARGB(255, 38, 202, 197)
-                          : Colors.white,
-                      fontSize: 32,
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                  Text(
-                    'LOGIN',
-                    style: TextStyle(
-                      color: isDarkMode
-                          ? Color.fromARGB(255, 38, 202, 197)
-                          : Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                Pilihrole(someCondition: true)),
-                      );
-                    },
-                    child: Text(
-                      'Belum Punya Akun? Registrasi',
-                      style: TextStyle(
-                          color: isDarkMode
-                              ? Color.fromARGB(255, 38, 202, 197)
-                              : Colors.white),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // White container with form
             Positioned(
               bottom: 0,
               left: 0,
               right: 0,
               child: Container(
-                height: MediaQuery.of(context).size.height * 0.65,
-                decoration: BoxDecoration(
-                  color: isDarkMode
-                      ? const Color.fromARGB(255, 202, 201, 201)
-                      : Colors.white,
+                height: 450,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(30),
                     topRight: Radius.circular(30),
                   ),
                 ),
-                child: SingleChildScrollView(
+                child: Center(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Container(
@@ -159,36 +54,25 @@ class _LoginState extends State<Login> {
                           TextField(
                             controller: usernameController,
                             decoration: InputDecoration(
-                              prefixIcon: Icon(Icons.person),
-                              filled: true,
-                              fillColor: Colors.white,
-                              prefixIconColor:
-                                  isDarkMode ? Color(0xFF2A2A3C) : Colors.blue,
+                              prefixIcon: const Icon(Icons.person),
+                              prefixIconColor: Colors.blue,
                               labelText: 'Username',
-                              labelStyle: TextStyle(
-                                  color: isDarkMode
-                                      ? Color(0xFF2A2A3C)
-                                      : Colors.grey),
+                              labelStyle: const TextStyle(color: Colors.grey),
                               contentPadding: const EdgeInsets.symmetric(
                                   vertical: 10, horizontal: 10),
-                              enabledBorder: OutlineInputBorder(
+                              enabledBorder: const OutlineInputBorder(
                                 borderRadius: BorderRadius.only(
                                     topLeft: Radius.circular(25),
                                     topRight: Radius.circular(25),
                                     bottomLeft: Radius.circular(10),
                                     bottomRight: Radius.circular(10)),
-                                borderSide: BorderSide(
-                                    color: isDarkMode
-                                        ? Color(0xFF2A2A3C)
-                                        : Color(0xFF2563EB)),
+                                borderSide:
+                                    BorderSide(color: Color(0xFF2563EB)),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20),
-                                borderSide: BorderSide(
-                                    color: isDarkMode
-                                        ? Color(0xFF2A2A3C)
-                                        : Colors.blue,
-                                    width: 2),
+                                borderSide: const BorderSide(
+                                    color: Colors.blue, width: 2),
                               ),
                             ),
                           ),
@@ -198,35 +82,24 @@ class _LoginState extends State<Login> {
                             obscureText: true,
                             decoration: InputDecoration(
                               prefixIcon: const Icon(Icons.lock),
-                              filled: true,
-                              fillColor: Colors.white,
-                              prefixIconColor:
-                                  isDarkMode ? Color(0xFF2A2A3C) : Colors.blue,
+                              prefixIconColor: Colors.blue,
                               labelText: 'Password',
-                              labelStyle: TextStyle(
-                                  color: isDarkMode
-                                      ? Color(0xFF2A2A3C)
-                                      : Colors.grey),
+                              labelStyle: const TextStyle(color: Colors.grey),
                               contentPadding: const EdgeInsets.symmetric(
                                   vertical: 10, horizontal: 10),
-                              enabledBorder: OutlineInputBorder(
+                              enabledBorder: const OutlineInputBorder(
                                 borderRadius: BorderRadius.only(
                                     topLeft: Radius.circular(10),
                                     topRight: Radius.circular(10),
                                     bottomLeft: Radius.circular(25),
                                     bottomRight: Radius.circular(25)),
-                                borderSide: BorderSide(
-                                    color: isDarkMode
-                                        ? Color(0xFF2A2A3C)
-                                        : Color(0xFF2563EB)),
+                                borderSide:
+                                    BorderSide(color: Color(0xFF2563EB)),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20),
-                                borderSide: BorderSide(
-                                    color: isDarkMode
-                                        ? Color(0xFF2A2A3C)
-                                        : Colors.blue,
-                                    width: 2),
+                                borderSide: const BorderSide(
+                                    color: Colors.blue, width: 2),
                               ),
                             ),
                           ),
@@ -235,11 +108,8 @@ class _LoginState extends State<Login> {
                             alignment: Alignment.center,
                             height: 50,
                             decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border.all(
-                                  color: isDarkMode
-                                      ? Color(0xFF2A2A3C)
-                                      : const Color(0xFF2563EB)),
+                              border:
+                                  Border.all(color: const Color(0xFF2563EB)),
                               borderRadius: BorderRadius.circular(25),
                             ),
                             child: Padding(
@@ -249,11 +119,12 @@ class _LoginState extends State<Login> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Image.asset(
-                                    'img/logoGoogle.png',
-                                    width: 20,
-                                    height: 20,
+                                    'img/logoGoogle.png', // Replace with your image asset path
+                                    width: 20, // Adjust width
+                                    height: 20, // Adjust height
                                   ),
-                                  const SizedBox(width: 8),
+                                  const SizedBox(
+                                      width: 8), // Space between image and text
                                   const Text(
                                     "Login dengan Google",
                                     style: TextStyle(color: Colors.black54),
@@ -274,85 +145,83 @@ class _LoginState extends State<Login> {
                               String uriNakes =
                                   "http://10.0.2.2/APIPPB/view_nakes.php";
 
+                              //Backend disini ngecek apakah password dan rolenya sesuai yang di register
                               try {
-                                // Check for Pasien role
                                 var pasienResponse =
                                     await http.get(Uri.parse(uriPasien));
                                 if (pasienResponse.statusCode == 200) {
                                   List<dynamic> listPasien =
                                       jsonDecode(pasienResponse.body);
-                                  var user = listPasien.firstWhere(
+                                  var User = listPasien.firstWhere(
                                     (user) =>
                                         user['username'] == username &&
                                         user['password'] == password,
-                                    orElse: () => null,
+                                    orElse: () =>
+                                        null, // Return null if no match is found
                                   );
-                                  if (user != null) {
-                                    pasienSaatini.username = user['username'];
-                                    pasienSaatini.password = user['password'];
-                                    pasienSaatini.email = user['email'];
-                                    pasienSaatini.id = user['idpasien'];
-                                    pasienSaatini.usia = user['usia'];
-                                    pasienSaatini.nama = user['nama'];
-                                    pasienSaatini.gender = user['gender'];
+                                  if (User != null) {
+                                    pasienSaatini.username = User['username'];
+                                    pasienSaatini.password = User['password'];
+                                    pasienSaatini.email = User['email'];
+                                    pasienSaatini.id = User['idpasien'];
+                                    pasienSaatini.usia = User['usia'];
+                                    pasienSaatini.nama = User['nama'];
+                                    pasienSaatini.gender = User['gender'];
                                     Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => loadingpagePasien(
-                                          pasienSaatini: pasienSaatini,
-                                          someCondition: true,
-                                        ),
-                                      ),
-                                    );
-                                    return; // Exit function if found in pasien role
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                loadingpagePasien(
+                                                    pasienSaatini:
+                                                        pasienSaatini)));
+                                  } else {
+                                    print(
+                                        'username atau password salah atau bukan role pasien');
                                   }
+                                } else {
+                                  print("ERROR HTTP: $pasienResponse");
                                 }
+                              } catch (e) {
+                                print('Error Login: $e');
+                              }
 
-                                // Check for Nakes role
+                              try {
                                 var nakesResponse =
                                     await http.get(Uri.parse(uriNakes));
                                 if (nakesResponse.statusCode == 200) {
                                   List<dynamic> listNakes =
                                       jsonDecode(nakesResponse.body);
-                                  var user = listNakes.firstWhere(
+                                  var User = listNakes.firstWhere(
                                     (user) =>
                                         user['username'] == username &&
                                         user['password'] == password,
-                                    orElse: () => null,
+                                    orElse: () =>
+                                        null, // Return null if no match is found
                                   );
-                                  if (user != null) {
-                                    nakesSaatini.id = user['idnakes'];
-                                    nakesSaatini.username = user['username'];
+                                  if (User != null) {
+                                    nakesSaatini.id = User['idnakes'];
+                                    nakesSaatini.username = User['username'];
                                     nakesSaatini.namaLengkap =
-                                        user['namalengkap'];
-                                    nakesSaatini.email = user['email'];
-                                    nakesSaatini.nomorSTR = user['nomorSTR'];
+                                        User['namalengkap'];
+                                    nakesSaatini.email = User['email'];
+                                    nakesSaatini.nomorSTR = User['nomorSTR'];
+                                    // print(
+                                    //     "Print yang masuk ${nakesSaatini.id} ${nakesSaatini.username} ${nakesSaatini.namaLengkap} ${nakesSaatini.email} ${nakesSaatini.nomorSTR}");
                                     Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => loadingpageNakes(
-                                          nakesSaatIni: nakesSaatini,
-                                          someCondition: true,
-                                        ),
-                                      ),
-                                    );
-                                    return; // Exit function if found in nakes role
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                loadingpageNakes(
+                                                  nakesSaatIni: nakesSaatini,
+                                                )));
                                   }
                                 }
-
-                                // If not found in both roles
-                                print(
-                                    'Username atau password salah atau bukan role pasien/nakes');
-                                showErrorDialog(
-                                    context, "Username atau Password Salah!");
                               } catch (e) {
                                 print('Error Login: $e');
                               }
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: isDarkMode
-                                  ? Color.fromARGB(255, 38, 202, 197)
-                                  : Color(0xFF2563EB),
+                              backgroundColor: const Color(0xFF2563EB),
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 60.0,
                               ),
@@ -360,12 +229,10 @@ class _LoginState extends State<Login> {
                                 borderRadius: BorderRadius.circular(40),
                               ),
                             ),
-                            child: Text(
+                            child: const Text(
                               'Login',
                               style: TextStyle(
-                                  color: isDarkMode
-                                      ? Color(0xFF2A2A3C)
-                                      : Colors.white,
+                                  color: Colors.white,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 20),
                             ),
@@ -394,6 +261,55 @@ class _LoginState extends State<Login> {
                     ),
                   ),
                 ),
+              ),
+            ),
+            // Add your logo or icon here
+            Positioned(
+              top: 50,
+              left: 0,
+              right: 0,
+              child: Column(
+                children: <Widget>[
+                  Align(
+                    alignment: const Alignment(0.20, 0),
+                    child: Image.asset(
+                      'img/loadingtop.png',
+                      width: 50,
+                      height: 50,
+                    ),
+                  ),
+                  const SizedBox(height: 1),
+                  const Text(
+                    'CERDIK',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 32,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                  const Text(
+                    'LOGIN',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      // Navigate to login screen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Pilihrole()),
+                      );
+                    },
+                    child: const Text(
+                      'Belum Punya Akun? Registrasi',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
