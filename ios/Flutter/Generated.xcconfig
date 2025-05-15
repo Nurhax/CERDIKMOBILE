@@ -1,6 +1,6 @@
 // This is a generated file; do not edit or check into version control.
-FLUTTER_ROOT=C:\flutter_windows_3.24.3-stable\flutter
-FLUTTER_APPLICATION_PATH=C:\Downloads\CERDIKMOBILE-main\CERDIKMOBILE-main
+FLUTTER_ROOT=C:\FLUTTER\flutter
+FLUTTER_APPLICATION_PATH=C:\Kuliah\SEMESTER 6\PROTING III\tubes\tubes
 COCOAPODS_PARALLEL_CODE_SIGN=true
 FLUTTER_TARGET=lib\main.dart
 FLUTTER_BUILD_DIR=build

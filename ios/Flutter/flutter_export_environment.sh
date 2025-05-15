@@ -1,7 +1,7 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=C:\flutter_windows_3.24.3-stable\flutter"
-export "FLUTTER_APPLICATION_PATH=C:\Downloads\CERDIKMOBILE-main\CERDIKMOBILE-main"
+export "FLUTTER_ROOT=C:\FLUTTER\flutter"
+export "FLUTTER_APPLICATION_PATH=C:\Kuliah\SEMESTER 6\PROTING III\tubes\tubes"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_TARGET=lib\main.dart"
 export "FLUTTER_BUILD_DIR=build"
