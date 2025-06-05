@@ -21,7 +21,7 @@ else return;
 
 
 if(isset($_POST["email"])){
-    $email = $_POST["usia"];
+    $email = $_POST["email"];
 }
 else return;
 
@@ -53,7 +53,7 @@ else return;
 
 
 $query = "UPDATE `pasien` SET
-`id`='$id',`username`='$username',`password`='$password',`email`='$email',`usia`='$email',`nama`='$nama',`gender`='$gender',`gejala`='$gejala',`jadwal`='$jadwal' 
+`id`='$id',`username`='$username',`password`='$password',`email`='$email',`usia`='$usia',`nama`='$nama',`gender`='$gender',`gejala`='$gejala',`jadwal`='$jadwal' 
 WHERE `id` = $id";
 
  $exe=mysqli_query($con,$query);
