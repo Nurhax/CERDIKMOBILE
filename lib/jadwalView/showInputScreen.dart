@@ -1,18 +1,43 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:tubes/Models/obat.dart';
 import 'package:tubes/models/manage_jadwal.dart';
+import 'package:provider/provider.dart';
+import 'package:tubes/theme_provider.dart'; // Import file yang dibuat
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
+
+String formatTimeOfDay(TimeOfDay tod) {
+  final now = DateTime.now();
+  final dt = DateTime(now.year, now.month, now.day, tod.hour, tod.minute);
+  return DateFormat('h:mm a').format(dt);
+}
 
 class ShowInputScreen extends StatefulWidget {
   final Function onRefresh;
+  String pasienID;
+  final http.Client? client;
 
-  ShowInputScreen({required this.onRefresh});
-
+  ShowInputScreen({
+    required this.onRefresh,
+    required this.pasienID,
+    this.client, // Make it optional});
+  });
   @override
   _ShowInputScreenState createState() => _ShowInputScreenState();
 }
 
 class _ShowInputScreenState extends State<ShowInputScreen> {
+  @override
+  void initState() {
+    super.initState();
+    idPasien.text = widget.pasienID;
+    fetchObatDropdown();
+  }
+
   final TextEditingController idPasien = TextEditingController();
-  final TextEditingController namaObat = TextEditingController();
+  String? selectedNamaObat;
   final TextEditingController penyakit = TextEditingController();
   final TextEditingController deskripsi = TextEditingController();
   final TextEditingController jumlah = TextEditingController();
@@ -22,10 +47,24 @@ class _ShowInputScreenState extends State<ShowInputScreen> {
   String? selectedJenisObat;
   String? selectedFrekuensi;
   TimeOfDay? selectedWaktuKonsumsi;
+  String? idObat;
+
+  List<Obat> listObatDropdown = [];
+
+  Future<void> fetchObatDropdown() async {
+    try {
+      final result = await Obat.fetchAllObat(client: widget.client);
+      setState(() {
+        listObatDropdown = result;
+      });
+    } catch (e) {
+      print("Gagal mengambil data obat: $e");
+    }
+  }
 
   Future<void> submitForm() async {
     if (idPasien.text.isNotEmpty &&
-        namaObat.text.isNotEmpty &&
+        selectedNamaObat != "" &&
         penyakit.text.isNotEmpty &&
         startDate.text.isNotEmpty &&
         endDate.text.isNotEmpty &&
@@ -35,17 +74,20 @@ class _ShowInputScreenState extends State<ShowInputScreen> {
       try {
         Map<String, String> data = {
           "IDPasien": idPasien.text,
-          "NamaObat": namaObat.text,
+          "IDObat": idObat!,
+          "NamaObat": selectedNamaObat!,
           "Gejala": penyakit.text, // Sesuaikan nama field
           "Dosis": jumlah.text, // Sesuaikan nama field
           "Deskripsi": deskripsi.text,
           "JenisObat": selectedJenisObat!,
           "Start_Date": startDate.text,
           "End_Date": endDate.text,
-          "WaktuKonsumsi": selectedWaktuKonsumsi!.format(context),
+          "WaktuKonsumsi": formatTimeOfDay(selectedWaktuKonsumsi!),
           "Frekuensi": selectedFrekuensi!, // Tambahan field jika diperlukan
+          "IsConfirmedNakes": "0"
         };
 
+        print(selectedFrekuensi);
         print('Data to be sent: $data');
 
         final response = await JadwalService.insertJadwal(data);
@@ -67,7 +109,7 @@ class _ShowInputScreenState extends State<ShowInputScreen> {
       }
     } else {
       print('ID Pasien: ${idPasien.text}');
-      print('Nama Obat: ${namaObat.text}');
+      print('Nama Obat: ${selectedNamaObat}');
       print('Gejala: ${penyakit.text}'); // Tambahkan log untuk field baru
       print('Dosis: ${jumlah.text}'); // Tambahkan log untuk field baru
       print('Start Date: ${startDate.text}');
@@ -102,6 +144,7 @@ class _ShowInputScreenState extends State<ShowInputScreen> {
     );
     if (picked != null && picked != selectedWaktuKonsumsi) {
       setState(() {
+        print(selectedWaktuKonsumsi);
         selectedWaktuKonsumsi = picked;
       });
     }
@@ -109,10 +152,23 @@ class _ShowInputScreenState extends State<ShowInputScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
     return Scaffold(
       appBar: AppBar(
-        title: Text("Input Jadwal"),
-        backgroundColor: Colors.blue,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: Text(
+          "Input Jadwal",
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: isDarkMode
+            ? Color(0xFF2A2A3C)
+            : const Color.fromARGB(255, 37, 105, 255),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -120,13 +176,18 @@ class _ShowInputScreenState extends State<ShowInputScreen> {
           child: Column(
             children: [
               Center(
-                child: Image.asset('assets/images/pills.png',
-                    width: 100, height: 100),
+                child: Image.asset(
+                    isDarkMode ? 'img/pillDark.png' : 'assets/images/pills.png',
+                    width: 100,
+                    height: 100),
               ),
               TextField(
                 controller: idPasien,
+                style: TextStyle(color: Colors.black),
                 decoration: InputDecoration(
                   hintText: "Masukkan ID Pasien",
+                  hintStyle: TextStyle(
+                      color: isDarkMode ? Colors.white : Colors.black),
                 ),
               ),
               Row(
@@ -134,12 +195,64 @@ class _ShowInputScreenState extends State<ShowInputScreen> {
                   Expanded(
                     child: Column(
                       children: [
-                        Text("Nama Obat"),
-                        TextField(
-                          controller: namaObat,
+                        Text(
+                          "Nama Obat",
+                          style: TextStyle(color: Colors.black),
+                        ),
+                        DropdownButtonFormField(
+                          value: selectedNamaObat,
+                          style: TextStyle(color: Colors.black),
+                          items: listObatDropdown.map((obat) {
+                            return DropdownMenuItem<String>(
+                              value: obat.nama,
+                              child: Text(
+                                obat.nama!,
+                                style: TextStyle(
+                                  color:
+                                      isDarkMode ? Colors.white : Colors.black,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              selectedNamaObat = value;
+
+                              final selectedObat = listObatDropdown
+                                  .firstWhere((obat) => obat.nama == value);
+
+                              deskripsi.text = selectedObat.deskripsi ?? '';
+                              penyakit.text = selectedObat.gejalaObat ?? '';
+                              idObat = selectedObat.idObat;
+                              final jenis = selectedObat.jenis;
+                              if (jenis == 'Kapsul' ||
+                                  jenis == 'Tablet' ||
+                                  jenis == 'Obat cair' ||
+                                  jenis == 'Cream' ||
+                                  jenis == 'Lotion, gel' ||
+                                  jenis == 'Suntiokan') {
+                                selectedJenisObat = jenis;
+                              } else {
+                                selectedJenisObat = 'Tablet'; // default
+                              }
+                            });
+                          },
                           decoration: InputDecoration(
-                            hintText: "Masukkan nama obat",
+                            hintText: "Pilih obat",
+                            hintStyle: TextStyle(
+                              color: isDarkMode ? Colors.white70 : Colors.black,
+                            ),
+                            filled: true,
+                            fillColor: isDarkMode
+                                ? Color(0xFF2A2A3C)
+                                : const Color.fromARGB(255, 37, 105, 255),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
                           ),
+                          dropdownColor: isDarkMode
+                              ? Color(0xFF2A2A3C)
+                              : const Color.fromARGB(255, 37, 105, 255),
                         ),
                       ],
                     ),
@@ -148,11 +261,16 @@ class _ShowInputScreenState extends State<ShowInputScreen> {
                   Expanded(
                     child: Column(
                       children: [
-                        Text("Penyakit"),
+                        Text(
+                          "Penyakit",
+                          style: TextStyle(color: Colors.black),
+                        ),
                         TextField(
                           controller: penyakit,
+                          style: TextStyle(color: Colors.black),
                           decoration: InputDecoration(
                             hintText: "Masukkan penyakit",
+                            hintStyle: TextStyle(color: Colors.black),
                           ),
                         ),
                       ],
@@ -163,9 +281,13 @@ class _ShowInputScreenState extends State<ShowInputScreen> {
               SizedBox(height: 16.0),
               Column(
                 children: [
-                  Text("Deskripsi"),
+                  Text(
+                    "Deskripsi",
+                    style: TextStyle(color: Colors.black),
+                  ),
                   TextField(
                     controller: deskripsi,
+                    style: TextStyle(color: Colors.black),
                     decoration: InputDecoration(
                       hintText: "Masukkan deskripsi",
                       border: OutlineInputBorder(
@@ -173,9 +295,12 @@ class _ShowInputScreenState extends State<ShowInputScreen> {
                             BorderRadius.circular(12.0), // Rounded corners
                       ),
                       filled: true,
-                      fillColor: Color(0xFFBFDBFE), // Background color
-                      hintStyle:
-                          TextStyle(color: Colors.grey), // Hint text color
+                      fillColor: isDarkMode
+                          ? Color.fromARGB(255, 231, 231, 231)
+                          : Color(0xFFBFDBFE), // Background color
+                      hintStyle: TextStyle(
+                          color: const Color.fromARGB(
+                              255, 179, 178, 178)), // Hint text color
                     ),
                     maxLines: 8, // Number of lines for a big text area
                   ),
@@ -184,125 +309,188 @@ class _ShowInputScreenState extends State<ShowInputScreen> {
               SizedBox(height: 16.0),
               Column(
                 children: [
-                  Text("Jenis Obat"),
+                  Text(
+                    "Jenis Obat",
+                    style: TextStyle(color: Colors.black),
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       GestureDetector(
                         onTap: () {
                           setState(() {
-                            selectedJenisObat = 'pil';
+                            selectedJenisObat = 'Kapsul';
                           });
                         },
                         child: Container(
                           decoration: BoxDecoration(
                             border: Border.all(
-                              color: selectedJenisObat == 'pil'
-                                  ? Colors.blue
+                              color: selectedJenisObat == 'Kapsul'
+                                  ? (isDarkMode
+                                      ? Color(0xFF00FFF5)
+                                      : const Color.fromARGB(255, 37, 105, 255))
                                   : Colors.transparent,
                               width: 2.0,
                             ),
                             borderRadius: BorderRadius.circular(8.0),
                           ),
-                          child: Image.asset(
-                            'assets/icons/pil.png',
-                            width: 50, // Adjust size as needed
-                            height: 50, // Adjust size as needed
-                          ),
+                          child: Icon(Icons.medication,
+                              size: 50,
+                              color: selectedJenisObat == 'Kapsul'
+                                  ? (isDarkMode
+                                      ? Color(0xFF00FFF5)
+                                      : const Color.fromARGB(255, 37, 105, 255))
+                                  : isDarkMode
+                                      ? Color(0xFF2A2A3C)
+                                      : Color.fromARGB(255, 201, 201, 201)),
                         ),
                       ),
                       GestureDetector(
                         onTap: () {
                           setState(() {
-                            selectedJenisObat = 'salep';
+                            selectedJenisObat = 'Tablet';
                           });
                         },
                         child: Container(
                           decoration: BoxDecoration(
                             border: Border.all(
-                              color: selectedJenisObat == 'salep'
-                                  ? Colors.blue
+                              color: selectedJenisObat == 'Tablet'
+                                  ? (isDarkMode
+                                      ? Color(0xFF00FFF5)
+                                      : const Color.fromARGB(255, 37, 105, 255))
                                   : Colors.transparent,
                               width: 2.0,
                             ),
                             borderRadius: BorderRadius.circular(8.0),
                           ),
-                          child: Image.asset(
-                            'assets/icons/salep.png',
-                            width: 50, // Adjust size as needed
-                            height: 50, // Adjust size as needed
-                          ),
+                          child: Icon(Icons.circle_rounded,
+                              size: 50,
+                              color: selectedJenisObat == 'Tablet'
+                                  ? (isDarkMode
+                                      ? Color(0xFF00FFF5)
+                                      : const Color.fromARGB(255, 37, 105, 255))
+                                  : isDarkMode
+                                      ? Color(0xFF2A2A3C)
+                                      : Color.fromARGB(255, 206, 206, 206)),
                         ),
                       ),
                       GestureDetector(
                         onTap: () {
                           setState(() {
-                            selectedJenisObat = 'krim';
+                            selectedJenisObat = 'Obat cair';
                           });
                         },
                         child: Container(
                           decoration: BoxDecoration(
                             border: Border.all(
-                              color: selectedJenisObat == 'krim'
-                                  ? Colors.blue
+                              color: selectedJenisObat == 'Obat cair'
+                                  ? (isDarkMode
+                                      ? Color(0xFF00FFF5)
+                                      : const Color.fromARGB(255, 37, 105, 255))
                                   : Colors.transparent,
                               width: 2.0,
                             ),
                             borderRadius: BorderRadius.circular(8.0),
                           ),
-                          child: Image.asset(
-                            'assets/icons/krim.png',
-                            width: 50, // Adjust size as needed
-                            height: 50, // Adjust size as needed
-                          ),
+                          child: Icon(Icons.water_drop,
+                              size: 50,
+                              color: selectedJenisObat == 'Obat cair'
+                                  ? (isDarkMode
+                                      ? Color(0xFF00FFF5)
+                                      : const Color.fromARGB(255, 37, 105, 255))
+                                  : isDarkMode
+                                      ? Color(0xFF2A2A3C)
+                                      : Color.fromARGB(255, 206, 206, 206)),
                         ),
                       ),
                       GestureDetector(
                         onTap: () {
                           setState(() {
-                            selectedJenisObat = 'botol';
+                            selectedJenisObat = 'Lotion, gel';
                           });
                         },
                         child: Container(
                           decoration: BoxDecoration(
                             border: Border.all(
-                              color: selectedJenisObat == 'botol'
-                                  ? Colors.blue
+                              color: selectedJenisObat == 'Lotion, gel'
+                                  ? (isDarkMode
+                                      ? Color(0xFF00FFF5)
+                                      : const Color.fromARGB(255, 37, 105, 255))
                                   : Colors.transparent,
                               width: 2.0,
                             ),
                             borderRadius: BorderRadius.circular(8.0),
                           ),
-                          child: Image.asset(
-                            'assets/icons/botol.png',
-                            width: 50, // Adjust size as needed
-                            height: 50, // Adjust size as needed
-                          ),
+                          child: Icon(Icons.medication_liquid_rounded,
+                              size: 50,
+                              color: selectedJenisObat == 'Lotion, gel'
+                                  ? (isDarkMode
+                                      ? Color(0xFF00FFF5)
+                                      : const Color.fromARGB(255, 37, 105, 255))
+                                  : isDarkMode
+                                      ? Color(0xFF2A2A3C)
+                                      : Color.fromARGB(255, 206, 206, 206)),
                         ),
                       ),
                       GestureDetector(
                         onTap: () {
                           setState(() {
-                            selectedJenisObat = 'tablet';
+                            selectedJenisObat = 'Cream';
                           });
                         },
                         child: Container(
                           decoration: BoxDecoration(
                             border: Border.all(
-                              color: selectedJenisObat == 'tablet'
-                                  ? Colors.blue
+                              color: selectedJenisObat == 'Cream'
+                                  ? (isDarkMode
+                                      ? Color(0xFF00FFF5)
+                                      : const Color.fromARGB(255, 37, 105, 255))
                                   : Colors.transparent,
                               width: 2.0,
                             ),
                             borderRadius: BorderRadius.circular(8.0),
                           ),
-                          child: Image.asset(
-                            'assets/icons/tablet.png',
-                            width: 50, // Adjust size as needed
-                            height: 50, // Adjust size as needed
-                          ),
+                          child: Icon(Icons.medication_liquid,
+                              size: 50,
+                              color: selectedJenisObat == 'Cream'
+                                  ? (isDarkMode
+                                      ? Color(0xFF00FFF5)
+                                      : const Color.fromARGB(255, 37, 105, 255))
+                                  : isDarkMode
+                                      ? Color(0xFF2A2A3C)
+                                      : Color.fromARGB(255, 206, 206, 206)),
                         ),
                       ),
+                      GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              selectedJenisObat = 'Suntikan';
+                            });
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: selectedJenisObat == 'Suntikan'
+                                    ? (isDarkMode
+                                        ? Color(0xFF00FFF5)
+                                        : const Color.fromARGB(
+                                            255, 37, 105, 255))
+                                    : Colors.transparent,
+                                width: 2.0,
+                              ),
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            child: Icon(Icons.vaccines,
+                                size: 50,
+                                color: selectedJenisObat == 'Suntikan'
+                                    ? (isDarkMode
+                                        ? Color(0xFF00FFF5)
+                                        : const Color.fromARGB(
+                                            255, 37, 105, 255))
+                                    : isDarkMode
+                                        ? Color(0xFF2A2A3C)
+                                        : Color.fromARGB(255, 206, 206, 206)),
+                          )),
                     ],
                   ),
                 ],
@@ -313,14 +501,22 @@ class _ShowInputScreenState extends State<ShowInputScreen> {
                   Expanded(
                     child: Column(
                       children: [
-                        Text("Mulai"),
+                        Text(
+                          "Mulai",
+                          style: TextStyle(color: Colors.black),
+                        ),
                         TextField(
                           readOnly: true,
                           controller: startDate,
                           decoration: InputDecoration(
                             hintText: "17 Juni 2024",
+                            hintStyle: TextStyle(color: Colors.black),
                             suffixIcon: IconButton(
-                              icon: Icon(Icons.calendar_today),
+                              icon: Icon(Icons.calendar_today,
+                                  color: isDarkMode
+                                      ? Color(0xFF2A2A3C)
+                                      : const Color.fromARGB(
+                                          255, 179, 178, 178)),
                               onPressed: () => _selectDate(context, startDate),
                             ),
                           ),
@@ -332,14 +528,22 @@ class _ShowInputScreenState extends State<ShowInputScreen> {
                   Expanded(
                     child: Column(
                       children: [
-                        Text("Selesai"),
+                        Text(
+                          "Selesai",
+                          style: TextStyle(color: Colors.black),
+                        ),
                         TextField(
                           readOnly: true,
                           controller: endDate,
                           decoration: InputDecoration(
                             hintText: "22 Juni 2024",
+                            hintStyle: TextStyle(color: Colors.black),
                             suffixIcon: IconButton(
-                              icon: Icon(Icons.calendar_today),
+                              icon: Icon(Icons.calendar_today,
+                                  color: isDarkMode
+                                      ? Color(0xFF2A2A3C)
+                                      : const Color.fromARGB(
+                                          255, 179, 178, 178)),
                               onPressed: () => _selectDate(context, endDate),
                             ),
                           ),
@@ -352,7 +556,10 @@ class _ShowInputScreenState extends State<ShowInputScreen> {
               SizedBox(height: 16.0),
               Column(
                 children: [
-                  Text("Waktu Konsumsi"),
+                  Text(
+                    "Waktu Konsumsi",
+                    style: TextStyle(color: Colors.black),
+                  ),
                   TextField(
                     readOnly: true,
                     controller: TextEditingController(
@@ -360,8 +567,12 @@ class _ShowInputScreenState extends State<ShowInputScreen> {
                     ),
                     decoration: InputDecoration(
                       hintText: "08.00 - 10.00",
+                      hintStyle: TextStyle(color: Colors.black),
                       suffixIcon: IconButton(
-                        icon: Icon(Icons.access_time),
+                        icon: Icon(Icons.access_time,
+                            color: isDarkMode
+                                ? Color(0xFF2A2A3C)
+                                : const Color.fromARGB(255, 179, 178, 178)),
                         onPressed: () => _selectTime(context),
                       ),
                     ),
@@ -371,11 +582,16 @@ class _ShowInputScreenState extends State<ShowInputScreen> {
               SizedBox(height: 16.0),
               Column(
                 children: [
-                  Text("Jumlah"),
+                  Text(
+                    "Jumlah",
+                    style: TextStyle(color: Colors.black),
+                  ),
                   TextField(
                     controller: jumlah,
+                    style: TextStyle(color: Colors.black),
                     decoration: InputDecoration(
                       hintText: "0",
+                      hintStyle: TextStyle(color: Colors.black),
                     ),
                   ),
                 ],
@@ -383,9 +599,14 @@ class _ShowInputScreenState extends State<ShowInputScreen> {
               SizedBox(height: 16.0),
               Column(
                 children: [
-                  Text("Frekuensi"),
+                  Text(
+                    "Frekuensi",
+                    style: TextStyle(color: Colors.black),
+                  ),
                   DropdownButtonFormField<String>(
+                    hint: Text("Pilih frekuensi"),
                     value: selectedFrekuensi,
+                    style: TextStyle(color: Colors.white),
                     items: [
                       DropdownMenuItem(
                           value: "Setiap Hari", child: Text("Setiap Hari")),
@@ -400,13 +621,40 @@ class _ShowInputScreenState extends State<ShowInputScreen> {
                     },
                     decoration: InputDecoration(
                       hintText: "Setiap Hari",
+                      hintStyle: TextStyle(
+                        color: isDarkMode ? Colors.white70 : Colors.black,
+                      ),
+                      filled: true,
+                      fillColor: isDarkMode
+                          ? Color(0xFF2A2A3C)
+                          : const Color.fromARGB(255, 37, 105, 255),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
                     ),
+                    dropdownColor: isDarkMode
+                        ? Color(0xFF2A2A3C)
+                        : const Color.fromARGB(255, 37, 105, 255),
                   ),
                 ],
               ),
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: submitForm,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: isDarkMode
+                      ? Color(0xFF2A2A3C)
+                      : const Color.fromARGB(
+                          255, 37, 105, 255), // warna latar tombol
+                  foregroundColor: isDarkMode
+                      ? Color(0xFF00D1C1)
+                      : Colors.white, // warna teks tombol
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20), // bentuk tombol
+                  ),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 24, vertical: 12), // ukuran
+                ),
                 child: Text("Tambah"),
               ),
             ],

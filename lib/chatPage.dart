@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'theme_provider.dart'; // Import file yang dibuat
 
 void main() {
-  runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => ThemeProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -9,12 +16,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Help Center',
-      theme: ThemeData(
-        primaryColor: Color.fromARGB(255, 37, 100, 235),
-      ),
-      home: ChatPage(),
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return MaterialApp(
+          title: 'Help Center',
+          debugShowCheckedModeBanner: false,
+          theme: themeProvider.currentTheme,
+          home: ChatPage(),
+        );
+      },
     );
   }
 }
@@ -31,11 +41,16 @@ class _ChatPageState extends State<ChatPage> {
   final List<Map<String, dynamic>> _messages = [];
 
   final Map<String, String> _descriptions = {
-    "Bantuan untuk pasien": "Kami menyediakan berbagai bantuan untuk pasien, termasuk informasi tentang jadwal obat pasien",
-    "Bantuan untuk tenaga kesehatan": "Dukungan bagi tenaga kesehatan, termasuk akses ke data pasien dan input jadwal pasien",
-    "Mengenai obat dan jadwal": "Informasi tentang obat-obatan dan jadwal penggunaannya sesuai resep dokter yang dapat dilihat pada menu pasien.",
-    "Bantuan Lainnya": "Jika Anda membutuhkan bantuan lain, silakan hubungi kami untuk informasi lebih lanjut.",
-    "Contact developer": "Silakan hubungi developer di email: support@chatbot.com."
+    "Bantuan untuk pasien":
+        "Kami menyediakan berbagai bantuan untuk pasien, termasuk informasi tentang jadwal obat pasien",
+    "Bantuan untuk tenaga kesehatan":
+        "Dukungan bagi tenaga kesehatan, termasuk akses ke data pasien dan input jadwal pasien",
+    "Mengenai obat dan jadwal":
+        "Informasi tentang obat-obatan dan jadwal penggunaannya sesuai resep dokter yang dapat dilihat pada menu pasien.",
+    "Bantuan Lainnya":
+        "Jika Anda membutuhkan bantuan lain, silakan hubungi kami untuk informasi lebih lanjut.",
+    "Contact developer":
+        "Silakan hubungi developer di email: iqbalnur2009@gmail.com."
   };
 
   @override
@@ -43,7 +58,8 @@ class _ChatPageState extends State<ChatPage> {
     super.initState();
     Future.delayed(const Duration(milliseconds: 500), () {
       setState(() {
-        _messages.add({'chat': 1, 'message': "Halo, ada yang bisa saya bantu?"});
+        _messages
+            .add({'chat': 1, 'message': "Halo, ada yang bisa saya bantu?"});
       });
     });
   }
@@ -88,8 +104,12 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 37, 100, 235),
+      backgroundColor: isDarkMode
+          ? Color(0xFF2A2A3C)
+          : const Color.fromARGB(255, 37, 100, 235),
       body: SafeArea(
         child: Stack(
           children: [
@@ -107,39 +127,44 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget _headerChat() {
-  return Container(
-    padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        GestureDetector(
-          onTap: () {
-            Navigator.pop(context); // Kembali ke halaman sebelumnya
-          },
-          child: const Icon(Icons.arrow_back_ios, size: 25, color: Colors.white),
-        ),
-        const SizedBox(width: 10), // Spasi antara ikon dan teks
-        const CircleAvatar(
-          backgroundImage: AssetImage('img/avabot.png'), // Tambahkan gambar avatar
-          radius: 20, // Ukuran avatar
-        ),
-        const SizedBox(width: 10), // Spasi antara avatar dan teks
-        const Text(
-          "Chatbot",
-          style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),
-        ),
-      ],
-    ),
-  );
-}
-
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          GestureDetector(
+            onTap: () {
+              Navigator.pop(context); // Kembali ke halaman sebelumnya
+            },
+            child:
+                const Icon(Icons.arrow_back_ios, size: 25, color: Colors.white),
+          ),
+          const SizedBox(width: 10), // Spasi antara ikon dan teks
+          const CircleAvatar(
+            backgroundImage:
+                AssetImage('img/avabot.png'), // Tambahkan gambar avatar
+            radius: 20, // Ukuran avatar
+          ),
+          const SizedBox(width: 10), // Spasi antara avatar dan teks
+          const Text(
+            "Chatbot",
+            style: TextStyle(
+                fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _bodyChat() {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
     return Container(
       padding: const EdgeInsets.only(left: 20, right: 20, top: 10),
-      decoration: const BoxDecoration(
-        borderRadius: BorderRadius.only(topLeft: Radius.circular(40), topRight: Radius.circular(40)),
-        color: Colors.white,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(40), topRight: Radius.circular(40)),
+        color: isDarkMode ? Color.fromARGB(255, 222, 220, 220) : Colors.white,
       ),
       child: ListView.builder(
         reverse: true,
@@ -168,41 +193,49 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget _optionButton(String text) {
-  return GestureDetector(
-    onTap: () => _selectOption(text),
-    child: Align(
-      alignment: Alignment.centerLeft,
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 50),
-        padding: const EdgeInsets.all(15),
-        decoration: BoxDecoration(
-          color: Colors.blue.shade100,
-          borderRadius: BorderRadius.circular(30),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.shade400,
-              blurRadius: 4,
-              offset: const Offset(2, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.help_outline, color: Colors.black54, size: 15),
-            const SizedBox(width: 10),
-            Text(text, style: const TextStyle(color: Colors.black, fontSize: 13)),
-          ],
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
+    return GestureDetector(
+      onTap: () => _selectOption(text),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Container(
+          margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 50),
+          padding: const EdgeInsets.all(15),
+          decoration: BoxDecoration(
+            color: isDarkMode ? Color(0xFF2A2A3C) : Colors.blue.shade100,
+            borderRadius: BorderRadius.circular(30),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.shade400,
+                blurRadius: 4,
+                offset: const Offset(2, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.help_outline,
+                  color: isDarkMode ? Colors.white : Colors.black54, size: 15),
+              const SizedBox(width: 10),
+              Text(text,
+                  style: TextStyle(
+                      color: isDarkMode ? Colors.white : Colors.black,
+                      fontSize: 13)),
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 
   Widget _chatItem({required int chat, required String message}) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
     return Row(
-      mainAxisAlignment: chat == 1 ? MainAxisAlignment.start : MainAxisAlignment.end,
+      mainAxisAlignment:
+          chat == 1 ? MainAxisAlignment.start : MainAxisAlignment.end,
       children: [
         if (chat == 1) ...[
           const CircleAvatar(
@@ -213,13 +246,27 @@ class _ChatPageState extends State<ChatPage> {
         ],
         Flexible(
           child: Container(
-            margin: EdgeInsets.only(left: chat == 1 ? 0 : 40, right: chat == 1 ? 40 : 0, top: 20),
+            margin: EdgeInsets.only(
+                left: chat == 1 ? 0 : 40, right: chat == 1 ? 40 : 0, top: 20),
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: chat == 0 ? const Color.fromARGB(255, 37, 105, 255) : Colors.blue.shade100,
+              color: chat == 0
+                  ? isDarkMode
+                      ? Color(0xFF2A2A3C)
+                      : const Color.fromARGB(255, 37, 105, 255)
+                  : isDarkMode
+                      ? Color(0xFF2A2A3C)
+                      : Colors.blue.shade100,
               borderRadius: BorderRadius.circular(30),
             ),
-            child: Text(message, style: TextStyle(color: chat == 0 ? Colors.white : Colors.black87, fontSize: 16)),
+            child: Text(message,
+                style: TextStyle(
+                    color: chat == 0
+                        ? Colors.white
+                        : isDarkMode
+                            ? Colors.white
+                            : Colors.black87,
+                    fontSize: 16)),
           ),
         ),
       ],
@@ -227,44 +274,50 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget _inputChat() {
-  return Positioned(
-    bottom: 0,
-    left: 0,
-    right: 0,
-    child: Container(
-      margin: const EdgeInsets.only(top: 10), // Tambahkan sedikit jarak
-      padding: const EdgeInsets.all(10),
-      color: Colors.white,
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: _controller,
-              decoration: InputDecoration(
-                hintText: "Message...",
-                filled: true,
-                fillColor: Colors.blue.shade100,
-                contentPadding: const EdgeInsets.all(20),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide.none,
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
+    return Positioned(
+      bottom: 0,
+      left: 0,
+      right: 0,
+      child: Container(
+        margin: const EdgeInsets.only(top: 10), // Tambahkan sedikit jarak
+        padding: const EdgeInsets.all(10),
+        color: isDarkMode ? Color.fromARGB(255, 222, 220, 220) : Colors.white,
+        child: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _controller,
+                decoration: InputDecoration(
+                  hintText: "Message...",
+                  filled: true,
+                  fillColor:
+                      isDarkMode ? Color(0xFF2A2A3C) : Colors.blue.shade100,
+                  contentPadding: const EdgeInsets.all(20),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: BorderSide.none,
+                  ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(width: 10),
-          ElevatedButton(
-            onPressed: _sendMessage,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Color.fromARGB(255, 37, 105, 255),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-              padding: const EdgeInsets.all(15),
+            const SizedBox(width: 10),
+            ElevatedButton(
+              onPressed: _sendMessage,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isDarkMode
+                    ? Color(0xFF2A2A3C)
+                    : Color.fromARGB(255, 37, 105, 255),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30)),
+                padding: const EdgeInsets.all(15),
+              ),
+              child: const Icon(Icons.send_rounded, color: Colors.white),
             ),
-            child: const Icon(Icons.send_rounded, color: Colors.white),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 }

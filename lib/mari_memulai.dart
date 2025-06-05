@@ -1,8 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:tubes/pilihRole.dart';
+import 'package:provider/provider.dart';
+import 'theme_provider.dart'; // Import file yang dibuat
+import 'package:tubes/Notification/noti_service.dart';
 
 void main() {
-  runApp(MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+
+  //init Notfications
+  NotiService().initNotification();
+
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => ThemeProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -10,27 +24,36 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Cerdik',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: HomePage(),
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return MaterialApp(
+          title: 'Cerdik',
+          debugShowCheckedModeBanner: false,
+          theme: themeProvider.currentTheme,
+          home: HomePage(someCondition: true),
+        );
+      },
     );
   }
 }
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  final bool someCondition;
+  const HomePage({super.key, required this.someCondition});
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.blue[300]!, Colors.blue[700]!],
+            colors: [
+              isDarkMode ? Color(0xFF2A2A3C) : Colors.blue[300]!,
+              isDarkMode ? Color(0xFF2A2A3C) : Colors.blue[700]!
+            ],
           ),
         ),
         child: Column(
@@ -62,7 +85,9 @@ class HomePage extends StatelessWidget {
                       Shadow(
                         offset: Offset(1.0, 1.0),
                         blurRadius: 12.0,
-                        color: Color.fromARGB(255, 255, 255, 255),
+                        color: isDarkMode
+                            ? Color.fromARGB(255, 38, 202, 197)
+                            : Color.fromARGB(255, 255, 255, 255),
                       ),
                     ],
                   ),
@@ -77,13 +102,17 @@ class HomePage extends StatelessWidget {
                       textAlign: TextAlign.left,
                       style: TextStyle(
                         fontSize: 40,
-                        color: Colors.white,
+                        color: isDarkMode
+                            ? Color.fromARGB(255, 38, 202, 197)
+                            : Colors.white,
                         fontWeight: FontWeight.w600,
                         shadows: [
                           Shadow(
                             offset: Offset(1.0, 1.0),
                             blurRadius: 12.0,
-                            color: Color.fromARGB(255, 255, 255, 255),
+                            color: isDarkMode
+                                ? Color.fromARGB(255, 38, 202, 197)
+                                : Color.fromARGB(255, 255, 255, 255),
                           ),
                         ],
                       ),
@@ -93,9 +122,25 @@ class HomePage extends StatelessWidget {
                 SizedBox(height: 150),
                 ElevatedButton(
                   onPressed: () {
+                    // final now = DateTime.now();
+                    // final scheduleTime = DateTime(
+                    //     now.year, now.month, now.day, now.hour, now.minute + 1);
+
+                    // NotiService().scheduleNotification(
+                    //   id: 999,
+                    //   title: 'Test',
+                    //   body: 'Custom Sound Test',
+                    //   hour: scheduleTime.hour,
+                    //   minute: scheduleTime.minute,
+                    //   soundName: 'aurora',
+                    // );
+
+                    // print(
+                    //     'Notification scheduled for ${scheduleTime.toLocal()} with sound aurora');
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => Pilihrole()),
+                      MaterialPageRoute(
+                          builder: (context) => Pilihrole(someCondition: true)),
                     );
                   },
                   child: Text(
@@ -103,8 +148,10 @@ class HomePage extends StatelessWidget {
                     style: TextStyle(fontSize: 20),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.blue,
+                    backgroundColor: isDarkMode
+                        ? Color.fromARGB(255, 38, 202, 197)
+                        : Colors.white,
+                    foregroundColor: isDarkMode ? Colors.white : Colors.blue,
                     padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),

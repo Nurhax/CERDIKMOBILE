@@ -5,10 +5,11 @@ import 'package:tubes/models/jadwal.dart';
 import 'package:tubes/models/manage_jadwal.dart';
 import 'showInputScreen.dart';
 import 'jadwal_detail.dart'; // Import the detail screen
+import 'package:provider/provider.dart';
+import 'package:tubes/theme_provider.dart'; // Import file yang dibuat
 
 class HomeScreen extends StatefulWidget {
-
-  final String? patientId; 
+  final String? patientId;
 
   const HomeScreen({Key? key, this.patientId}) : super(key: key);
 
@@ -18,17 +19,32 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 1; // Index for schedule page
-  late Future<List<JadwalObat>> _futureJadwalObat;
+  late Future<List<JadwalObat>> _futureJadwalObat = Future.value([]);
+
+  Future<void> _loadAndFilterJadwal() async {
+    final allJadwal = await JadwalService.fetchJadwalObat();
+
+    if (widget.patientId != null) {
+      final filtered = filterJadwalByPasienId(allJadwal, widget.patientId!);
+      setState(() {
+        _futureJadwalObat = Future.value(filtered);
+      });
+    } else {
+      setState(() {
+        _futureJadwalObat = Future.value(allJadwal);
+      });
+    }
+  }
+
+  List<JadwalObat> filterJadwalByPasienId(
+      List<JadwalObat> allJadwal, String pasienId) {
+    return allJadwal.where((jadwal) => jadwal.idPasien == pasienId).toList();
+  }
 
   @override
   void initState() {
     super.initState();
-    // Fetch data based on patientId if provided
-    if (widget.patientId != null) {
-      _futureJadwalObat = JadwalService.fetchJadwalById(widget.patientId!);
-    } else {
-      _futureJadwalObat = JadwalService.fetchJadwalObat();
-    }
+    _loadAndFilterJadwal();
   }
 
   void _onItemTapped(int index) {
@@ -40,31 +56,31 @@ class _HomeScreenState extends State<HomeScreen> {
   void refreshData() {
     setState(() {
       if (widget.patientId != null) {
-        _futureJadwalObat = JadwalService.fetchJadwalById(widget.patientId!);
+        _loadAndFilterJadwal();
       } else {
         _futureJadwalObat = JadwalService.fetchJadwalObat();
       }
     });
   }
 
- Future<void> handleDelete(String id) async {
-  try {
-    final response = await JadwalService.deleteJadwal(id);
-    if (response["status"] == "success") {
+  Future<void> handleDelete(String id) async {
+    try {
+      final response = await JadwalService.deleteJadwal(id);
+      if (response["status"] == "success") {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Jadwal successfully deleted")),
+        );
+        refreshData();
+      } else {
+        throw Exception("Failed to delete Jadwal");
+      }
+    } catch (e) {
+      print(e);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Jadwal successfully deleted")),
+        SnackBar(content: Text("Error: $e")),
       );
-      refreshData();
-    } else {
-      throw Exception("Failed to delete Jadwal");
     }
-  } catch (e) {
-    print(e);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Error: $e")),
-    );
   }
-}
 
   void _handleMenuAction(String value, JadwalObat jadwal) {
     if (value == 'Edit') {
@@ -84,10 +100,10 @@ class _HomeScreenState extends State<HomeScreen> {
               'Frekuensi': jadwal.frekuensi,
               'WaktuKonsumsi': jadwal.waktuKonsumsi,
             },
-            onRefresh:
-                refreshData, idJadwal: jadwal.idJadwal, // Call a method to refresh the list after editing
+            onRefresh: refreshData,
+            idJadwal: jadwal
+                .idJadwal, // Call a method to refresh the list after editing
           ),
-          
         ),
       );
     } else if (value == 'Delete') {
@@ -111,15 +127,29 @@ class _HomeScreenState extends State<HomeScreen> {
       case 'tablet':
         return 'assets/icons/tablet.png';
       default:
-        return 'assets/icons/default.png';
+        return 'assets/icons/tablet.png';
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Jadwal Obat'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: Text(
+          'Jadwal Obat',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: isDarkMode
+            ? Color(0xFF2A2A3C)
+            : const Color.fromARGB(255, 37, 105, 255),
       ),
       body: FutureBuilder<List<JadwalObat>>(
         future: _futureJadwalObat,
@@ -149,7 +179,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     margin: EdgeInsets.all(8.0),
                     padding: EdgeInsets.all(16.0),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: isDarkMode ? Color(0xFF2A2A3C) : Colors.white,
                       borderRadius: BorderRadius.circular(12.0),
                       boxShadow: [
                         BoxShadow(
@@ -177,12 +207,33 @@ class _HomeScreenState extends State<HomeScreen> {
                                   jadwal.namaObat,
                                   style: TextStyle(
                                       fontSize: 18,
-                                      fontWeight: FontWeight.bold),
+                                      fontWeight: FontWeight.bold,
+                                      color: isDarkMode
+                                          ? Colors.white
+                                          : Colors.black),
                                 ),
                                 SizedBox(height: 5),
-                                Text('Gejala: ${jadwal.gejala}'),
-                                Text('Dosis: ${jadwal.dosis}'),
-                                Text('Waktu Konsumsi: ${jadwal.waktuKonsumsi}'),
+                                Text(
+                                  'Gejala: ${jadwal.gejala}',
+                                  style: TextStyle(
+                                      color: isDarkMode
+                                          ? Colors.white
+                                          : Colors.black),
+                                ),
+                                Text(
+                                  'Dosis: ${jadwal.dosis}',
+                                  style: TextStyle(
+                                      color: isDarkMode
+                                          ? Colors.white
+                                          : Colors.black),
+                                ),
+                                Text(
+                                  'Waktu Konsumsi: ${jadwal.waktuKonsumsi}',
+                                  style: TextStyle(
+                                      color: isDarkMode
+                                          ? Colors.white
+                                          : Colors.black),
+                                ),
                               ],
                             ),
                           ],
@@ -208,32 +259,38 @@ class _HomeScreenState extends State<HomeScreen> {
           }
         },
       ),
-       bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today),
-            label: 'Calendar',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.more_horiz),
-            label: 'More',
-          ),
-        ],
-      ),
+      //Remove navbar random
+      //  bottomNavigationBar: BottomNavigationBar(
+      //   items: const [
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.home),
+      //       label: 'Home',
+      //     ),
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.calendar_today),
+      //       label: 'Calendar',
+      //     ),
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.more_horiz),
+      //       label: 'More',
+      //     ),
+      //   ],
+      // ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ShowInputScreen(onRefresh: refreshData),
+              builder: (context) => ShowInputScreen(
+                  onRefresh: refreshData, pasienID: widget.patientId!),
             ),
           );
         },
-        child: Icon(Icons.add),
+        backgroundColor: isDarkMode
+            ? Color(0xFF2A2A3C)
+            : const Color.fromARGB(255, 37, 105, 255),
+        child: Icon(Icons.add, color: Colors.white),
+        shape: const CircleBorder(),
       ),
     );
   }

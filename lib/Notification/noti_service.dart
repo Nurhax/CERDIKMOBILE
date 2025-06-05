@@ -43,7 +43,11 @@ class NotiService {
     const InitializationSettings initSetting =
         InitializationSettings(android: initSettingsAndroid);
 
-    await _createNotificationChannel();
+    await _createNotificationChannel(
+      channelId: 'default_channel',
+      channelName: 'Default Channel',
+      soundName: null,
+    );
 
     await notificationsPlugin.initialize(
       initSetting,
@@ -53,31 +57,46 @@ class NotiService {
     _isInitialized = true;
   }
 
-  Future<void> _createNotificationChannel() async {
-    print('Creating notification channel...');
-    const AndroidNotificationChannel channel = AndroidNotificationChannel(
-      'daily_channel_id',
-      'Daily Notification',
-      description: 'Daily Notification Channel',
+  Future<void> _createNotificationChannel({
+    required String channelId,
+    required String channelName,
+    required String? soundName,
+  }) async {
+    final androidChannel = AndroidNotificationChannel(
+      channelId,
+      channelName,
+      description: 'Channel with custom sound',
       importance: Importance.max,
-      playSound: true, // Add this
-      enableVibration: true, // Add this
+      sound: soundName != null
+          ? RawResourceAndroidNotificationSound(soundName.toLowerCase())
+          : null,
+      playSound: true,
+      enableVibration: true,
     );
+
     await notificationsPlugin
         .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(channel);
+        ?.createNotificationChannel(androidChannel);
   }
 
-  NotificationDetails notificationDetails() {
-    return const NotificationDetails(
+  NotificationDetails notificationDetails({
+    required String channelId,
+    required String channelName,
+    String? soundName,
+  }) {
+    return NotificationDetails(
       android: AndroidNotificationDetails(
-        'daily_channel_id',
-        'Daily Notification',
-        channelDescription: 'Daily Notification Channel',
+        channelId,
+        channelName,
+        channelDescription: 'Channel with custom sound',
         importance: Importance.max,
         priority: Priority.high,
-        showWhen: false,
+        playSound: true,
+        showWhen: true,
+        sound: soundName != null
+            ? RawResourceAndroidNotificationSound(soundName.toLowerCase())
+            : null,
       ),
     );
   }
@@ -92,7 +111,11 @@ class NotiService {
         id,
         title,
         body,
-        notificationDetails(),
+        notificationDetails(
+          channelId: 'default_channel',
+          channelName: 'Default Channel',
+          soundName: null,
+        ),
       );
     } catch (e) {
       print('Error showing notification: $e');
@@ -105,6 +128,7 @@ class NotiService {
     required String body,
     required int hour,
     required int minute,
+    String? soundName,
   }) async {
     try {
       final now = tz.TZDateTime.now(tz.local);
@@ -123,13 +147,28 @@ class NotiService {
       final timeUntilNotification = scheduledDate.difference(now);
       print('Time until notification: $timeUntilNotification');
 
-      // Schedule the notification without the timer
+      final channelId = soundName != null
+          ? 'channel_${soundName.toLowerCase()}'
+          : 'default_channel';
+      final channelName =
+          soundName != null ? 'Channel for $soundName' : 'Default Channel';
+
+      await _createNotificationChannel(
+        channelId: channelId,
+        channelName: channelName,
+        soundName: soundName,
+      );
+
       await notificationsPlugin.zonedSchedule(
         id,
         title,
         body,
         scheduledDate,
-        notificationDetails(),
+        notificationDetails(
+          channelId: channelId,
+          channelName: channelName,
+          soundName: soundName,
+        ),
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
         androidScheduleMode: AndroidScheduleMode.exact, // Use exact mode

@@ -2,9 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:tubes/login.dart';
 import 'package:tubes/models/nakes.dart';
 import 'package:tubes/models/pasien.dart';
+import 'package:provider/provider.dart';
+import 'theme_provider.dart'; // Import file yang dibuat
 
 void main() {
-  runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => ThemeProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -12,32 +19,44 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: ProfileScreen.pasien(pasienSaatini: Pasien()),
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: themeProvider.currentTheme,
+          home: ProfileScreen.pasien(
+              pasienSaatini: Pasien(), someCondition: true),
+        );
+      },
     );
   }
 }
 
 class ProfileScreen extends StatelessWidget {
+  final bool someCondition;
   final Pasien? pasienSaatini;
   final Nakes? nakesSaatini;
-  const ProfileScreen.pasien({super.key, required this.pasienSaatini})
+  const ProfileScreen.pasien(
+      {super.key, required this.someCondition, required this.pasienSaatini})
       : nakesSaatini = null;
   @override
-  const ProfileScreen.nakes({super.key, required this.nakesSaatini})
+  const ProfileScreen.nakes(
+      {super.key, required this.someCondition, required this.nakesSaatini})
       : pasienSaatini = null;
   //isiNakes
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor:
+          isDarkMode ? Color.fromARGB(255, 182, 181, 181) : Colors.white,
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 37, 100, 235),
+        backgroundColor: isDarkMode ? Color(0xFF2A2A3C) : Colors.blue[400],
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -53,10 +72,10 @@ class ProfileScreen extends StatelessWidget {
               Container(
                 height: 180,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                      colors: [Color.fromARGB(255, 37, 100, 235)!, Color.fromARGB(255, 70, 122, 238)!],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter),
+                  gradient: LinearGradient(colors: [
+                    isDarkMode ? Color(0xFF2A2A3C) : Colors.blue[400]!,
+                    isDarkMode ? Color(0xFF2A2A3C) : Colors.blue[600]!
+                  ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
                   borderRadius: BorderRadius.vertical(
                     bottom: Radius.elliptical(
                       MediaQuery.of(context).size.width,
@@ -71,7 +90,10 @@ class ProfileScreen extends StatelessWidget {
                   padding: EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: Color.fromARGB(255, 70, 122, 238)!, width: 3),
+                    border: Border.all(
+                        color:
+                            isDarkMode ? Color(0xFF00FFF5) : Colors.blue[400]!,
+                        width: 3),
                     color: Colors.white,
                   ),
                   child: CircleAvatar(
@@ -80,7 +102,7 @@ class ProfileScreen extends StatelessWidget {
                     child: Icon(
                       Icons.person,
                       size: 50,
-                      color: Color.fromARGB(255, 37, 100, 235),
+                      color: isDarkMode ? Color(0xFF00FFF5) : Colors.blue[400],
                     ),
                   ),
                 ),
@@ -97,21 +119,27 @@ class ProfileScreen extends StatelessWidget {
               children: [
                 if (pasienSaatini != null) ...[
                   _buildProfileField(
-                      Icons.person, '${pasienSaatini!.username}'),
-                  _buildProfileField(Icons.edit, '${pasienSaatini!.nama}'),
-                  _buildProfileField(Icons.email, '${pasienSaatini!.email}'),
+                      Icons.badge, 'ID: ${pasienSaatini!.id}', context),
                   _buildProfileField(
-                      Icons.calendar_today, '${pasienSaatini!.usia}'),
+                      Icons.person, '${pasienSaatini!.username}', context),
                   _buildProfileField(
-                      Icons.person_outline, '${pasienSaatini!.gender}')
+                      Icons.edit, '${pasienSaatini!.nama}', context),
+                  _buildProfileField(
+                      Icons.email, '${pasienSaatini!.email}', context),
+                  _buildProfileField(
+                      Icons.calendar_today, '${pasienSaatini!.usia}', context),
+                  _buildProfileField(
+                      Icons.person_outline, '${pasienSaatini!.gender}', context)
                 ],
                 if (nakesSaatini != null) ...[
-                  _buildProfileField(Icons.person, '${nakesSaatini!.username}'),
                   _buildProfileField(
-                      Icons.edit, '${nakesSaatini!.namaLengkap}'),
+                      Icons.person, '${nakesSaatini!.username}', context),
                   _buildProfileField(
-                      Icons.no_accounts, '${nakesSaatini!.nomorSTR}'),
-                  _buildProfileField(Icons.email, '${nakesSaatini!.email}'),
+                      Icons.edit, '${nakesSaatini!.namaLengkap}', context),
+                  _buildProfileField(
+                      Icons.no_accounts, '${nakesSaatini!.nomorSTR}', context),
+                  _buildProfileField(
+                      Icons.email, '${nakesSaatini!.email}', context),
                 ]
               ],
             ),
@@ -126,11 +154,12 @@ class ProfileScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const Login()),
+                  MaterialPageRoute(
+                      builder: (context) => const Login(someCondition: true)),
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red.shade400,
+                backgroundColor: Colors.red.shade300,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                 shape: RoundedRectangleBorder(
@@ -148,22 +177,26 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileField(IconData icon, String text) {
+  Widget _buildProfileField(IconData icon, String text, BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        border: Border.all(color: Color.fromARGB(255, 37, 100, 235)),
+        border: Border.all(
+            color: isDarkMode ? Color(0xFF2A2A3C) : Colors.blue.shade200),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
         children: [
-          Icon(icon, color: Color.fromARGB(255, 37, 100, 235)),
+          Icon(icon, color: isDarkMode ? Color(0xFF2A2A3C) : Colors.blue),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(color: Color.fromARGB(255, 37, 100, 235)),
+              style: TextStyle(
+                  color: isDarkMode ? Color(0xFF2A2A3C) : Colors.blue),
             ),
           ),
         ],

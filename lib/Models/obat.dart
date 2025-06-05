@@ -45,8 +45,25 @@ class Obat {
     };
   }
 
+  static Future<List<Obat>> fetchAllObat({http.Client? client}) async {
+    client ??= http.Client(); // Use real client if not mocked
+    final response =
+        await client.get(Uri.parse('https://letzgoo.net/api/view_obat.php'));
+    try {
+      if (response.statusCode == 200) {
+        List<dynamic> listObat = jsonDecode(response.body);
+        return listObat.map((item) => Obat.fromMap(item)).toList();
+      } else {
+        throw Exception(
+            "Failed to fetch data. Status Code: ${response.statusCode}");
+      }
+    } catch (e) {
+      throw Exception("Error fetching data: $e");
+    }
+  }
+
   static Future<Obat?> fetchObatByID(int id) async {
-    String uri = "http://10.0.2.2/APIPPB/get_obat.php?id=$id";
+    String uri = "https://letzgoo.net/api/get_obat.php?id=$id";
 
     try {
       final response = await http.get(Uri.parse(uri));
@@ -66,71 +83,77 @@ class Obat {
       throw Exception("Error fetching data: $e");
     }
   }
-static Future<bool> insertObatData(
-  String nama,
-  String jenis,
-  String dosis, // This is saranPenyajian
-  String gejala, // This should be gejalaobat in the backend
-  String deskripsi,
-  String satuan, // This is the 'ukuran' in the database
-) async {
-  String uri = "http://10.0.2.2/APIPPB/insert_record_obat.php"; // Replace with your actual URL
 
-  try {
-    final response = await http.post(
-      Uri.parse(uri),
-      body: {
-        'nama': nama,
-        'jenis': jenis,
-        'saranPenyajian': dosis, // This is the 'saranPenyajian' in the backend
-        'gejalaobat': gejala, // This matches the 'gejalaobat' parameter in the backend
-        'deskripsi': deskripsi,
-        'ukuran': satuan, // This matches the 'ukuran' column in the database
-      },
-    );
-
-    // Debugging: log the response status and body
-    print("Response Status: ${response.statusCode}");
-    print("Response Body: ${response.body}");
-
-    if (response.statusCode == 200) {
-      var data = jsonDecode(response.body);
-      print("Response Data: $data"); // Log the decoded data
-
-      if (data['success'] == 'true') {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      throw Exception("Failed to insert data. Status Code: ${response.statusCode}");
-    }
-  } catch (e) {
-    print("Error inserting data: $e"); // Log the error
-    throw Exception("Error inserting data: $e");
-  }
-} 
-
-static Future<bool> updateObatData(
-    String obatId,  // Add 'id' as a parameter
-    String obatName,
-    String jenisObat,
-    String dosis,
+  static Future<bool> insertObatData(
+    String nama,
+    String jenis,
+    String dosis, // This is saranPenyajian
+    String gejala, // This should be gejalaobat in the backend
     String deskripsi,
-    String gejalaObat,
-    String ukuran,
+    String satuan, // This is the 'ukuran' in the database
   ) async {
+    String uri =
+        "https://letzgoo.net/api/insert_record_obat.php"; // Replace with your actual URL
+
     try {
       final response = await http.post(
-        Uri.parse("http://10.0.2.2/APIPPB/update_obat.php"),
+        Uri.parse(uri),
         body: {
-          "id": obatId,  // Pass the 'id' of the obat
+          'nama': nama,
+          'jenis': jenis,
+          'dosis': dosis, // This is the 'saranPenyajian' in the backend
+          'gejala':
+              gejala, // This matches the 'gejalaobat' parameter in the backend
+          'ukuran': satuan,
+          'deskripsi':
+              deskripsi, // This matches the 'ukuran' column in the database
+        },
+      );
+
+      // Debugging: log the response status and body
+      print("Response Status: ${response.statusCode}");
+      print("Response Body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        print("Response Data: $data"); // Log the decoded data
+
+        if (data['success'] == 'true') {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        throw Exception(
+            "Failed to insert data. Status Code: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Error inserting data: $e"); // Log the error
+      throw Exception("Error inserting data: $e");
+    }
+  }
+
+  static Future<bool> updateObatData(
+      String obatId, // Add 'id' as a parameter
+      String obatName,
+      String old_obat_name,
+      String jenisObat,
+      String dosis,
+      String deskripsi,
+      String gejalaObat,
+      String ukuran) async {
+    try {
+      final response = await http.post(
+        Uri.parse("https://letzgoo.net/api/update_obat.php"),
+        body: {
+          "idobat": obatId, // Pass the 'id' of the obat
           "nama": obatName,
+          "old_nama": old_obat_name,
           "jenis": jenisObat,
-          "saranPenyajian": dosis,
-          "deskripsi": deskripsi,
-          "gejala_obat": gejalaObat,
+          "dosis": dosis,
+          "gejala": gejalaObat,
           "ukuran": ukuran,
+          "deskripsi": deskripsi,
         },
       );
 
@@ -142,7 +165,7 @@ static Future<bool> updateObatData(
       if (responseData['success'] == "true") {
         return true;
       } else {
-        print("Error: ${responseData['error']}");  // Log the error message
+        print("Error: ${responseData['error']}"); // Log the error message
         return false;
       }
     } catch (error) {
@@ -152,14 +175,14 @@ static Future<bool> updateObatData(
     }
   }
 
-static Future<bool> deleteObatData(String? idObat) async {
+  static Future<bool> deleteObatData(String? idObat) async {
     try {
       // Log the ID being sent for deletion
       print("Attempting to delete obat with ID: $idObat");
 
       // Perform the HTTP POST request
       final response = await http.post(
-        Uri.parse("http://10.0.2.2/APIPPB/delete_obat.php"),
+        Uri.parse("https://letzgoo.net/api/delete_obat.php"),
         body: {"idobat": idObat},
       );
 
